@@ -4,12 +4,14 @@ class MessageContent extends StatelessWidget {
   final String contenu;
   final String heure;
   final bool provenance;
+  final bool etat;
 
 
   MessageContent({
     required this.contenu,
     required this.heure,
     required this.provenance,
+    required this.etat,
   });
   @override
   Widget build(BuildContext context) {
@@ -67,6 +69,9 @@ class MessageContent extends StatelessWidget {
                     children: [
                       SizedBox(width: 7),
                       Text(heure,style: TextStyle(color: Colors.black),),
+                      !provenance? Text(""):etat? Icon(Icons.check,color: Colors.blue,):Icon(Icons.check,color: Colors.black45,),
+
+
                     ],
                   ),
                 ),

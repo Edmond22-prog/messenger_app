@@ -5,6 +5,7 @@ class HomeContent extends StatelessWidget {
   final String nom;
   final String lastmessage;
   final String heurelastmessage;
+  final bool enLigne;
 
 
   HomeContent({
@@ -12,11 +13,11 @@ class HomeContent extends StatelessWidget {
     required this.nom,
     required this.lastmessage,
     required this.heurelastmessage,
+    required this.enLigne,
   });
   @override
   Widget build(BuildContext context) {
     return Container(
-      //margin: provenance? EdgeInsets.only(left: 60,top: 22,right: 0,bottom: 10):EdgeInsets.only(left: 0,top: 22,right: 60,bottom: 10),
       width: MediaQuery.of(context).size.width,
       height: 70,
       decoration: BoxDecoration(
@@ -66,7 +67,7 @@ class HomeContent extends StatelessWidget {
                 children: [
                   Align(
                     child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5.0),
+                        padding: EdgeInsets.symmetric(horizontal: 15.0),
                         child: Text(nom,
                           style: TextStyle(
                               fontSize: 19,
@@ -116,7 +117,7 @@ class HomeContent extends StatelessWidget {
                 ),
                 alignment: Alignment.bottomLeft,
               ),
-              Text("")
+              enLigne?Text("en ligne",style: TextStyle(color: Colors.greenAccent),):Text("")
             ],
           )
 

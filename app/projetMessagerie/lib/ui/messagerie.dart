@@ -7,15 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projetmessagerie/ui/messagecontent.dart';
-import 'package:projetmessagerie/ui/messagerie.dart';
-import 'package:projetmessagerie/ui/src/globals.dart';
 import 'package:projetmessagerie/ui/src/widgets/record_button.dart';
 import 'package:record/record.dart';
 
 class MyMessagePage extends StatefulWidget {
-  const MyMessagePage({super.key, required this.id});
+  const MyMessagePage({super.key, required this.lechoix});
 
-  final String id;
+  final InChatModel lechoix;
 
   @override
   State<MyMessagePage> createState() => _MessagePageState();
@@ -27,97 +25,46 @@ class InChatModel{
   final String nom;
   final List<MessageModel> listmessage;
 
-  InChatModel({required this.avatarUrl, required this.nom, required this.listmessage});
+  final bool isOnLigne;
+
+  InChatModel({required this.avatarUrl, required this.nom, required this.listmessage, required this.isOnLigne});
 
   void add(String date,String message){
-    listmessage.add(new MessageModel(datetime:date,message:message,EnvMessage:true));
+    listmessage.add(new MessageModel(datetime:date,message:message,EnvMessage:true,etat: false));
+  }
+  MessageModel lastMessage(){
+    return listmessage.last;
   }
 }
 class MessageModel{
   final String datetime;
   final String message;
   final bool EnvMessage;//false = je recois   true = j'envoie le message
+  final bool etat;//false = message envoiyé  true = message reçu
 
-  MessageModel({required this.datetime, required this.message, required this.EnvMessage});
+  MessageModel({required this.datetime, required this.message, required this.EnvMessage, required this.etat});
+
 }
+
+
 
 class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderStateMixin{
 
 
-  static final List<InChatModel> mesConvData = [
-    InChatModel(
-        avatarUrl: "img/pp.png",
-        nom: "marc",
-        listmessage: [
-          MessageModel(
-              datetime: "20:30",
-              message: "bonjour",
-              EnvMessage: false
-          ),
-          MessageModel(
-              datetime: "20:31",
-              message: "bonjour",
-              EnvMessage: true
-          ),
-          MessageModel(
-              datetime: "20:40",
-              message: "cava?",
-              EnvMessage: false
-          ),
-        ]
-    ),
-    InChatModel(
-        avatarUrl: "img/pp.png",
-        nom: "marc1",
-        listmessage: [
-          MessageModel(
-              datetime: "20:30",
-              message: "bonjour",
-              EnvMessage: true
-          ),
-          MessageModel(
-              datetime: "20:38",
-              message: "yo",
-              EnvMessage: false
-          ),
-        ]
-    ),
-    InChatModel(
-        avatarUrl: "img/pp.png",
-        nom: "luc",
-        listmessage: [
-          MessageModel(
-              datetime: "20:35",
-              message: "bonjour",
-              EnvMessage: false
-          ),
-        ]
-    ),
-    InChatModel(
-        avatarUrl: "img/pp.png",
-        nom: "marc3",
-        listmessage: [
-          MessageModel(
-              datetime: "20:30",
-              message: "bonjour",
-              EnvMessage: true
-          ),
-        ]
-    ),
-
-  ];
 
 
-  late InChatModel lechoisie;
 
-  void verifChoisi(){
-    for(int i=0;i<mesConvData.length;i++) {
+  late InChatModel lechoisie ;
+/*
+  void verifChoisi(InChatModel lechois){
+    lechoisie=lechois;
+   /* for(int i=0;i<mesConvData.length;i++) {
       if (widget.id == mesConvData[i].nom) {
         lechoisie = mesConvData[i];
       }
-    }
+    }*/
   }
-
+*/
 
 
 
@@ -157,7 +104,8 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
     voiceState=true;
 
 
-    verifChoisi();
+    lechoisie = widget.lechoix;
+    //verifChoisi();
   }
 
   @override
@@ -285,7 +233,7 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
     return Scaffold(
       appBar: AppBar(
           title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Material(
                 elevation: 2.0,
@@ -301,9 +249,13 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
                     onTap: (){ },
                   ),
                 ),
-              ),
-              Text(lechoisie.nom),//nom de la personne
-              Text("")
+              ),Text("  "),
+              Column(
+                children: [
+                  Text(lechoisie.nom),
+                  lechoisie.isOnLigne?Text("en ligne",style: TextStyle(color: Colors.greenAccent,fontSize: 12),):Text("")
+                ],
+              )//nom de la personne
             ],
           )
       ),
@@ -319,6 +271,7 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
                   contenu: lechoisie.listmessage[index].message,
                   heure: lechoisie.listmessage[index].datetime,
                   provenance: lechoisie.listmessage[index].EnvMessage,
+                  etat: lechoisie.listmessage[index].etat,
                 )
             );
 
