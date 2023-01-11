@@ -1,0 +1,438 @@
+Index: app/projetMessagerie/lib/ui/messagerie.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>\r\n\r\nimport 'dart:async';\r\nimport 'dart:io';\r\n\r\nimport 'package:flutter/material.dart';\r\nimport 'package:flutter/services.dart';\r\nimport 'package:image_picker/image_picker.dart';\r\nimport 'package:projetmessagerie/ui/messagecontent.dart';\r\nimport 'package:projetmessagerie/ui/src/widgets/record_button.dart';\r\nimport 'package:record/record.dart';\r\n\r\nclass MyMessagePage extends StatefulWidget {\r\n  const MyMessagePage({super.key, required this.lechoix, required this.send});\r\n\r\n  final InChatModel lechoix;\r\n  final Function send ;\r\n\r\n  @override\r\n  State<MyMessagePage> createState() => _MessagePageState();\r\n\r\n}\r\n///////////////////////////////\r\nclass InChatModel{\r\n  final String avatarUrl;\r\n  final String nom;\r\n  final List<MessageModel> listmessage;\r\n\r\n  final bool isOnLigne;\r\n\r\n  InChatModel({required this.avatarUrl, required this.nom, required this.listmessage, required this.isOnLigne});\r\n\r\n  void add(String date,String message){\r\n    listmessage.add(new MessageModel(datetime:date,message:message,EnvMessage:true,etat: false));\r\n  }\r\n\r\n  MessageModel lastMessage(){\r\n    return listmessage.last;\r\n  }\r\n}\r\nclass MessageModel{\r\n  final String datetime;\r\n  final String message;\r\n  final bool EnvMessage;//false = je recois   true = j'envoie le message\r\n  final bool etat;//false = message envoiyé  true = message reçu\r\n\r\n  MessageModel({required this.datetime, required this.message, required this.EnvMessage, required this.etat});\r\n\r\n}\r\n\r\n\r\n\r\nclass _MessagePageState extends State<MyMessagePage> with SingleTickerProviderStateMixin{\r\n\r\n\r\n\r\n\r\n\r\n  late InChatModel lechoisie ;\r\n/*\r\n  void verifChoisi(InChatModel lechois){\r\n    lechoisie=lechois;\r\n   /* for(int i=0;i<mesConvData.length;i++) {\r\n      if (widget.id == mesConvData[i].nom) {\r\n        lechoisie = mesConvData[i];\r\n      }\r\n    }*/\r\n  }\r\n*/\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n  DateTime? startTime;\r\n  Timer? timer;\r\n  String recordDuration = \"00:00\";\r\n  //late Record record;\r\n  Record? record;\r\n\r\n  bool isLocked = false;\r\n  bool showLottie = false;\r\n\r\n\r\n\r\n  String message=\"\";\r\n  String heureEnvoie=\"\";\r\n  String dateEnvoie=\"\";\r\n\r\n  late AnimationController controller;\r\n\r\n  @override\r\n  void initState() {\r\n    super.initState();\r\n    controller = AnimationController(\r\n      vsync: this,\r\n      duration: const Duration(milliseconds: 600),\r\n    );\r\n\r\n\r\n    voiceState=true;\r\n\r\n\r\n    lechoisie = widget.lechoix;\r\n    //verifChoisi();\r\n  }\r\n\r\n  @override\r\n  void dispose() {\r\n    controller.dispose();\r\n    super.dispose();\r\n  }\r\n\r\n\r\n  void callEmoji() {\r\n    print('Emoji Icon Pressed...');\r\n  }\r\n\r\n  void callAttachFile() {\r\n    print('Attach File Icon Pressed...');\r\n  }\r\n\r\n  void callCamera() {\r\n    print('Camera Icon Pressed...');\r\n  }\r\n\r\n  void callVoice() {\r\n    print('Voice Icon Pressed...');\r\n  }\r\n  void sendMessage() {\r\n\r\n    DateTime sendDate = new DateTime.now();\r\n    dateEnvoie = sendDate.toString();\r\n    int h=sendDate.hour;\r\n    int m=sendDate.minute;\r\n\r\n    heureEnvoie = h.toString()+\":\"+m.toString();\r\n\r\n    lechoisie.add(heureEnvoie, message);\r\n\r\n\r\n    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=> super.widget));\r\n    print('Message send...');\r\n    final send = widget.send;\r\n    send(message,lechoisie.nom);\r\n  }\r\n\r\n\r\n\r\n\r\n  Widget moodIcon() {\r\n    return IconButton(\r\n        icon: const Icon(\r\n          Icons.mood,\r\n          color: Colors.black,\r\n        ),\r\n        onPressed: () => callEmoji());\r\n  }\r\n\r\n  Widget attachFile() {\r\n    return IconButton(\r\n      icon: const Icon(Icons.attachment_sharp, color: Colors.black),\r\n      onPressed: () {\r\n        setState(() {\r\n          dialog();\r\n          callAttachFile();\r\n        });\r\n      },\r\n    );\r\n  }\r\n\r\n  Widget camera() {\r\n    return IconButton(\r\n        icon: const Icon(Icons.photo_camera, color: Colors.black),\r\n        onPressed: () {\r\n          pickImage(ImageSource.camera);\r\n          callCamera();\r\n        }\r\n    );\r\n  }\r\n\r\n  bool voiceState =true;\r\n  Widget voiceIcon() {\r\n    return RecordButton(controller: controller);/*const Icon(\r\n  Icons.keyboard_voice,\r\n  color: Colors.black,\r\n  );*/\r\n  }\r\n  Widget voiceIcontexte() {\r\n    return const Icon(\r\n      Icons.send,\r\n      color: Colors.black,\r\n    );\r\n  }\r\n\r\n  Widget modeText(){\r\n    return Row(\r\n      children: [\r\n        moodIcon(),\r\n        Expanded(\r\n            child: Container(\r\n              child:TextField(\r\n                onChanged: (val){setState(() {\r\n                  if(val==\"\"){\r\n                    voiceState=true;\r\n                  }else{\r\n                    voiceState=false;\r\n                  }\r\n                  message=val;\r\n                });\r\n                },\r\n                decoration: InputDecoration(\r\n                    hintText: \"Message\",\r\n                    hintStyle: TextStyle(color: Colors.black),\r\n                    border: InputBorder.none\r\n                ),\r\n                maxLines: 5,\r\n                minLines: 1,\r\n              ),\r\n            )\r\n        ),\r\n        attachFile(),\r\n        camera(),\r\n      ],\r\n    );\r\n  }\r\n\r\n\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return Scaffold(\r\n      appBar: AppBar(\r\n          title: Row(\r\n            mainAxisAlignment: MainAxisAlignment.start,\r\n            children: [\r\n              Material(\r\n                elevation: 2.0,\r\n                shape: CircleBorder(),\r\n                clipBehavior: Clip.hardEdge,\r\n                color: Colors.transparent,\r\n                child: Ink.image(\r\n                  image: AssetImage(lechoisie.avatarUrl),//id.photoprofil\r\n                  fit: BoxFit.cover,\r\n                  width: 40,\r\n                  height: 40,\r\n                  child: InkWell(\r\n                    onTap: (){ },\r\n                  ),\r\n                ),\r\n              ),Text(\"  \"),\r\n              Column(\r\n                children: [\r\n                  Text(lechoisie.nom),\r\n                  lechoisie.isOnLigne?Text(\"en ligne\",style: TextStyle(color: Colors.greenAccent,fontSize: 12),):Text(\"\")\r\n                ],\r\n              )//nom de la personne\r\n            ],\r\n          )\r\n      ),\r\n      body: ListView.builder(\r\n          padding: const EdgeInsets.only(bottom: 55),\r\n          itemCount: lechoisie.listmessage.length,//nombre de messages dans la bd\r\n          itemBuilder: (context,index){\r\n            return InkWell(\r\n                onLongPress: (){\r\n                  //selection\r\n                },\r\n                child: MessageContent(\r\n                  contenu: lechoisie.listmessage[index].message,\r\n                  heure: lechoisie.listmessage[index].datetime,\r\n                  provenance: lechoisie.listmessage[index].EnvMessage,\r\n                  etat: lechoisie.listmessage[index].etat,\r\n                )\r\n            );\r\n\r\n          }),\r\n\r\n\r\n\r\n      floatingActionButton: BottomAppBar(\r\n        child: Container(\r\n            color: Colors.green.withOpacity(0.1),\r\n            child: Row(\r\n                children: [\r\n                  Expanded(\r\n                    child: Container(\r\n                      decoration: BoxDecoration(\r\n                        color: Colors.white,\r\n                        borderRadius: BorderRadius.circular(35.0),\r\n                        boxShadow: const [\r\n                          BoxShadow(\r\n                              offset: Offset(0, 2),\r\n                              blurRadius: 7,\r\n                              color: Colors.grey)\r\n                        ],\r\n                      ),\r\n                      child: modeText(),\r\n                    ),\r\n                  ),\r\n                  const SizedBox(width: 15),\r\n                  Container(\r\n                    padding: const EdgeInsets.all(15.0),\r\n                    decoration: const BoxDecoration(\r\n                        color: Color(0xFF00BFA5), shape: BoxShape.circle),\r\n                    child: InkWell(\r\n                      child: voiceState ? voiceIcon():voiceIcontexte(),\r\n\r\n                      onTap: (){\r\n                        if(!voiceState){\r\n                          sendMessage();\r\n                        }\r\n                      },\r\n                    ),\r\n                  )\r\n                ]\r\n            )\r\n        ),\r\n      ),floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,\r\n    );\r\n  }\r\n\r\n\r\n\r\n\r\n\r\n  Future<Null> dialog()async{\r\n    return showDialog(context: context,\r\n        barrierDismissible: true,\r\n        builder: (BuildContext context){\r\n          return Center(\r\n            child: Container(\r\n              decoration: BoxDecoration(\r\n                color: Colors.white,\r\n                borderRadius: BorderRadius.circular(35.0),\r\n              ),\r\n              width: MediaQuery.of(context).size.width/1.1,\r\n              height: MediaQuery.of(context).size.height/3,\r\n              child: Column(\r\n                mainAxisAlignment: MainAxisAlignment.spaceEvenly,\r\n                children: [\r\n                  Row(\r\n                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,\r\n                    children: [\r\n                      Icon( Icons.file_open, size: 50),\r\n                      Icon(Icons.camera, size: 50),\r\n                      Icon(Icons.filter, size: 50)\r\n                    ],\r\n                  ),\r\n                  Row(\r\n                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,\r\n                    children: [\r\n                      Icon(Icons.music_note_outlined, size: 50),\r\n                      Icon(Icons.location_on_outlined, size: 50),\r\n                      Icon(Icons.contacts, size: 50)\r\n                    ],\r\n                  )\r\n                ],\r\n              ),\r\n            ),\r\n          );\r\n        });\r\n  }\r\n\r\n  Future pickImage(ImageSource imageSource) async {\r\n    try {\r\n\r\n      final image = await ImagePicker().pickImage(source: imageSource);\r\n      if (image == null) return;\r\n\r\n      final imageFinal = File(image.path);\r\n      setState(() {\r\n        //function d'envoie de limage\r\n        print(\"image envoiyé\");\r\n      });\r\n    } on PlatformException catch (e) {\r\n      print(\"Failed to pick image $e\");\r\n    }\r\n  }\r\n\r\n\r\n\r\n}\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/projetMessagerie/lib/ui/messagerie.dart b/app/projetMessagerie/lib/ui/messagerie.dart
+--- a/app/projetMessagerie/lib/ui/messagerie.dart	(revision b9385a8762b85c7a85bada07973d3b8d6c9d041d)
++++ b/app/projetMessagerie/lib/ui/messagerie.dart	(date 1673433633570)
+@@ -267,6 +267,7 @@
+           padding: const EdgeInsets.only(bottom: 55),
+           itemCount: lechoisie.listmessage.length,//nombre de messages dans la bd
+           itemBuilder: (context,index){
++
+             return InkWell(
+                 onLongPress: (){
+                   //selection
+Index: app/projetMessagerie/lib/ui/src/widgets/record_button.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import 'dart:async';\r\nimport 'dart:io';\r\n\r\nimport 'package:flutter/material.dart';\r\n//import 'package:flutter_vibrate/flutter_vibrate.dart';\r\nimport 'package:font_awesome_flutter/font_awesome_flutter.dart';\r\nimport 'package:path_provider/path_provider.dart';\r\nimport 'package:permission_handler/permission_handler.dart';\r\nimport 'package:projetmessagerie/ui/src/audio_state.dart';\r\nimport 'package:projetmessagerie/ui/src/globals.dart';\r\nimport 'package:projetmessagerie/ui/src/widgets/flow_shader.dart';\r\nimport 'package:projetmessagerie/ui/src/widgets/lottie_animation.dart';\r\nimport 'package:record/record.dart';\r\n\r\nclass RecordButton extends StatefulWidget {\r\n  const RecordButton({\r\n    Key? key,\r\n    required this.controller,\r\n  }) : super(key: key);\r\n\r\n  final AnimationController controller;\r\n\r\n  @override\r\n  State<RecordButton> createState() => _RecordButtonState();\r\n}\r\n\r\nclass _RecordButtonState extends State<RecordButton> {\r\n  static const double size = 55;\r\n\r\n  final double lockerHeight = 200;\r\n  double timerWidth = 0;\r\n\r\n  late Animation<double> buttonScaleAnimation;\r\n  late Animation<double> timerAnimation;\r\n  late Animation<double> lockerAnimation;\r\n\r\n  DateTime? startTime;\r\n  Timer? timer;\r\n  String recordDuration = \"00:00\";\r\n  Record record = Record();\r\n  //late Record record;\r\n\r\n  bool isLocked = false;\r\n  bool showLottie = false;\r\n\r\n  @override\r\n  void initState() {\r\n    super.initState();\r\n    buttonScaleAnimation = Tween<double>(begin: 1, end: 2).animate(\r\n      CurvedAnimation(\r\n        parent: widget.controller,\r\n        curve: const Interval(0.0, 0.6, curve: Curves.elasticInOut),\r\n      ),\r\n    );\r\n    widget.controller.addListener(() {\r\n      setState(() {});\r\n    });\r\n  }\r\n\r\n  @override\r\n  void didChangeDependencies() {\r\n    super.didChangeDependencies();\r\n    timerWidth =\r\n        MediaQuery.of(context).size.width - 2 * Globals.defaultPadding - 4;\r\n    timerAnimation =\r\n        Tween<double>(begin: timerWidth + Globals.defaultPadding, end: 0)\r\n            .animate(\r\n      CurvedAnimation(\r\n        parent: widget.controller,\r\n        curve: const Interval(0.2, 1, curve: Curves.easeIn),\r\n      ),\r\n    );\r\n    lockerAnimation =\r\n        Tween<double>(begin: lockerHeight + Globals.defaultPadding, end: 0)\r\n            .animate(\r\n      CurvedAnimation(\r\n        parent: widget.controller,\r\n        curve: const Interval(0.2, 1, curve: Curves.easeIn),\r\n      ),\r\n    );\r\n  }\r\n\r\n  @override\r\n  void dispose() {\r\n    record.dispose();\r\n    timer?.cancel();\r\n    timer = null;\r\n    super.dispose();\r\n  }\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return Stack(\r\n      clipBehavior: Clip.none,\r\n      children: [\r\n        lockSlider(),\r\n        cancelSlider(),\r\n        audioButton(),\r\n        if (isLocked) timerLocked(),\r\n      ],\r\n    );\r\n  }\r\n\r\n  Widget lockSlider() {\r\n    return Positioned(\r\n      bottom: -lockerAnimation.value,\r\n      left: lockerAnimation.value-12,\r\n      child: Container(\r\n        height: lockerHeight,\r\n        width: size,\r\n        decoration: BoxDecoration(\r\n          borderRadius: BorderRadius.circular(Globals.borderRadius),\r\n          color: Colors.white,\r\n        ),\r\n        padding: const EdgeInsets.symmetric(vertical: 15),\r\n        child: Column(\r\n          mainAxisAlignment: MainAxisAlignment.start,\r\n          children: [\r\n            const FaIcon(FontAwesomeIcons.lock, size: 20),\r\n            const SizedBox(height: 8),\r\n            FlowShader(\r\n              direction: Axis.vertical,\r\n              child: Column(\r\n                children: const [\r\n                  Icon(Icons.keyboard_arrow_up),\r\n                  Icon(Icons.keyboard_arrow_up),\r\n                  Icon(Icons.keyboard_arrow_up),\r\n                ],\r\n              ),\r\n            ),\r\n          ],\r\n        ),\r\n      ),\r\n    );\r\n  }\r\n\r\n  Widget cancelSlider() {\r\n    return Positioned(\r\n      right: -timerAnimation.value,\r\n      top: timerAnimation.value-15,\r\n      child: Container(\r\n        height: size,\r\n        width: timerWidth,\r\n        decoration: BoxDecoration(\r\n          borderRadius: BorderRadius.circular(Globals.borderRadius),\r\n          color: Colors.white,\r\n        ),\r\n        child: Padding(\r\n          padding: const EdgeInsets.symmetric(horizontal: 15),\r\n          child: Row(\r\n            mainAxisAlignment: MainAxisAlignment.spaceBetween,\r\n            mainAxisSize: MainAxisSize.max,\r\n            children: [\r\n              showLottie ? const LottieAnimation() : Text(recordDuration),\r\n              const SizedBox(width: size),\r\n              FlowShader(\r\n                child: Row(\r\n                  children: const [\r\n                    Icon(Icons.keyboard_arrow_left),\r\n                    Text(\"Slide to cancel \")\r\n                  ],\r\n                ),\r\n                duration: const Duration(seconds: 3),\r\n                flowColors: const [Colors.white, Colors.grey],\r\n              ),\r\n              const SizedBox(width: size),\r\n            ],\r\n          ),\r\n        ),\r\n      ),\r\n    );\r\n  }\r\n\r\n  Widget timerLocked() {\r\n    return Positioned(\r\n      right: -5,\r\n      top: -15,\r\n      child: Container(\r\n        height: size,\r\n        width: timerWidth+5,\r\n        decoration: BoxDecoration(\r\n          borderRadius: BorderRadius.circular(Globals.borderRadius),\r\n          color: Colors.white,\r\n        ),\r\n        child: Padding(\r\n          padding: const EdgeInsets.only(left: 15, right: 25),\r\n          child: GestureDetector(\r\n            behavior: HitTestBehavior.opaque,\r\n            onTap: () async {\r\n              print(\"record areter\");\r\n              //Vibrate.feedback(FeedbackType.success);\r\n              timer?.cancel();\r\n              timer = null;\r\n              startTime = null;\r\n              recordDuration = \"00:00\";\r\n\r\n              var filePath = await Record().stop();\r\n              AudioState.files.add(filePath!);\r\n\r\n              Globals.audioListKey.currentState\r\n                  ?.insertItem(AudioState.files.length - 1);\r\n              debugPrint(filePath);\r\n              setState(() {\r\n                isLocked = false;\r\n              });\r\n            },\r\n            child: Row(\r\n              mainAxisAlignment: MainAxisAlignment.spaceBetween,\r\n              mainAxisSize: MainAxisSize.max,\r\n              children: [\r\n                IconButton(\r\n                    onPressed: (){\r\n                      timer?.cancel();\r\n                      timer = null;\r\n                      startTime = null;\r\n                      recordDuration = \"00:00\";\r\n\r\n                      setState(() {\r\n                        showLottie = true;\r\n                      });\r\n\r\n                      Timer(const Duration(milliseconds: 1440), () async {\r\n                        widget.controller.reverse();\r\n                        debugPrint(\"Cancelled recording\");\r\n                        var filePath = await record.stop();\r\n                        debugPrint(filePath);\r\n                        File(filePath!).delete();\r\n                        debugPrint(\"Deleted $filePath\");\r\n                        showLottie = false;\r\n                      });\r\n                    },\r\n                    icon: Icon(Icons.delete,color: Colors.red,)),\r\n                Text(recordDuration),\r\n                FlowShader(\r\n                  child: const Text(\"Tap lock to stop\"),\r\n                  duration: const Duration(seconds: 3),\r\n                  flowColors: const [Colors.white, Colors.grey],\r\n                ),\r\n                const Center(\r\n                  child: FaIcon(\r\n                    FontAwesomeIcons.lock,\r\n                    size: 18,\r\n                    color: Colors.green,\r\n                  ),\r\n                ),\r\n              ],\r\n            ),\r\n          ),\r\n        ),\r\n      ),\r\n    );\r\n  }\r\n\r\n  Widget audioButton() {\r\n    return GestureDetector(\r\n      child: Transform.scale(\r\n        scale: buttonScaleAnimation.value,\r\n        child: Container(\r\n          child: const Icon(Icons.mic),\r\n          /*height: size,\r\n          width: size,\r\n          clipBehavior: Clip.hardEdge,\r\n          decoration: BoxDecoration(\r\n            shape: BoxShape.circle,\r\n            color: Theme.of(context).primaryColor,\r\n          ),*/\r\n        ),\r\n      ),\r\n      onLongPressDown: (_) {\r\n        debugPrint(\"onLongPressDown\");\r\n        widget.controller.forward();\r\n      },\r\n      onLongPressEnd: (details) async {\r\n        debugPrint(\"onLongPressEnd\");\r\n\r\n        if (isCancelled(details.localPosition, context)) {\r\n          //Vibrate.feedback(FeedbackType.heavy);\r\n\r\n          timer?.cancel();\r\n          timer = null;\r\n          startTime = null;\r\n          recordDuration = \"00:00\";\r\n\r\n          setState(() {\r\n            showLottie = true;\r\n          });\r\n\r\n          Timer(const Duration(milliseconds: 1440), () async {\r\n            widget.controller.reverse();\r\n            debugPrint(\"Cancelled recording\");\r\n            var filePath = await record.stop();\r\n            debugPrint(filePath);\r\n            File(filePath!).delete();\r\n            debugPrint(\"Deleted $filePath\");\r\n            showLottie = false;\r\n          });\r\n        } else if (checkIsLocked(details.localPosition)) {\r\n          widget.controller.reverse();\r\n\r\n          //Vibrate.feedback(FeedbackType.heavy);\r\n          debugPrint(\"Locked recording\");\r\n          debugPrint(details.localPosition.dy.toString());\r\n          setState(() {\r\n            isLocked = true;\r\n          });\r\n        } else {\r\n          widget.controller.reverse();\r\n\r\n          //Vibrate.feedback(FeedbackType.success);\r\n\r\n          timer?.cancel();\r\n          timer = null;\r\n          startTime = null;\r\n          recordDuration = \"00:00\";\r\n\r\n          var filePath = await Record().stop();\r\n          AudioState.files.add(filePath!);\r\n          Globals.audioListKey.currentState\r\n              ?.insertItem(AudioState.files.length - 1);\r\n          debugPrint(filePath);\r\n        }\r\n      },\r\n      onLongPressCancel: () {\r\n        debugPrint(\"onLongPressCancel\");\r\n        widget.controller.reverse();\r\n      },\r\n      onLongPress: () async {\r\n        debugPrint(\"onLongPress\");\r\n        //Vibrate.feedback(FeedbackType.success);\r\n        if (await record.hasPermission()) {\r\n\r\n          recordFilePath = await getFilePath();\r\n\r\n          await record.start(path: recordFilePath);\r\n\r\n          startTime = DateTime.now();\r\n          timer = Timer.periodic(const Duration(seconds: 1), (_) {\r\n            final minDur = DateTime.now().difference(startTime!).inMinutes;\r\n            final secDur = DateTime.now().difference(startTime!).inSeconds % 60;\r\n            String min = minDur < 10 ? \"0$minDur\" : minDur.toString();\r\n            String sec = secDur < 10 ? \"0$secDur\" : secDur.toString();\r\n            setState(() {\r\n              recordDuration = \"$min:$sec\";\r\n            });\r\n          });\r\n        }\r\n      },\r\n    );\r\n  }\r\n\r\n  bool checkIsLocked(Offset offset) {\r\n    return (offset.dy < -35);\r\n  }\r\n\r\n  bool isCancelled(Offset offset, BuildContext context) {\r\n    return (offset.dx < -(MediaQuery.of(context).size.width * 0.2));\r\n  }\r\n\r\n  String recordFilePath=\"\";\r\n\r\n  Future<String> get _localPath async { // get directory path\r\n    final directory = await getExternalStorageDirectory();\r\n    print(directory!.path);\r\n    return directory.path;\r\n  }\r\n\r\n  Future<String> getFilePath() async {\r\n    String documentPath = await _localPath;\r\n\r\n    String sdPath = documentPath + \"/record\";\r\n    var d = Directory(sdPath);\r\n    if (!d.existsSync()) {\r\n      d.createSync(recursive: true);\r\n    }\r\n    return sdPath + \"/audio_${DateTime.now().millisecondsSinceEpoch}.m4a\";\r\n  }\r\n\r\n\r\n}\r\n\r\n\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/projetMessagerie/lib/ui/src/widgets/record_button.dart b/app/projetMessagerie/lib/ui/src/widgets/record_button.dart
+--- a/app/projetMessagerie/lib/ui/src/widgets/record_button.dart	(revision b9385a8762b85c7a85bada07973d3b8d6c9d041d)
++++ b/app/projetMessagerie/lib/ui/src/widgets/record_button.dart	(date 1673435114639)
+@@ -25,6 +25,18 @@
+ }
+ 
+ class _RecordButtonState extends State<RecordButton> {
++
++  String message="";
++  String heureEnvoie="";
++  String dateEnvoie="";
++
++
++
++
++
++
++
++
+   static const double size = 55;
+ 
+   final double lockerHeight = 200;
+@@ -318,6 +330,23 @@
+           Globals.audioListKey.currentState
+               ?.insertItem(AudioState.files.length - 1);
+           debugPrint(filePath);
++
++
++
++          DateTime sendDate = new DateTime.now();
++          dateEnvoie = sendDate.toString();
++          int h=sendDate.hour;
++          int m=sendDate.minute;
++
++          heureEnvoie = h.toString()+":"+m.toString();
++
++          //lechoisie.add(heureEnvoie, message);
++
++
++          //Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=> super.widget));
++          print('voice send...');
++
++
+         }
+       },
+       onLongPressCancel: () {
+Index: app/projetMessagerie/lib/ui/home.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import 'dart:convert';\r\n\r\nimport 'package:flutter/material.dart';\r\nimport 'package:socket_io_client/socket_io_client.dart' as IO;\r\nimport 'package:projetmessagerie/ui/homecontent.dart';\r\nimport 'package:projetmessagerie/ui/messagerie.dart';\r\nimport 'package:collection/collection.dart';\r\nimport 'package:intl/intl.dart';\r\nimport 'dart:math';\r\n\r\nclass HomePage extends StatefulWidget {\r\n  const HomePage({super.key, required this.title});\r\n\r\n  final String title;\r\n\r\n  @override\r\n  State<HomePage> createState() => _MyHomePageState();\r\n}\r\n\r\n///////////////////////////////\r\n\r\n/*\r\nclass ChatModel{\r\n  final String avatarUrl;\r\n  final String nom;\r\n  final String datetime;\r\n  final String message;\r\n  final bool isOnLigne;\r\n\r\n  ChatModel({required this.avatarUrl, required this.nom, required this.datetime, required this.message, required this.isOnLigne});\r\n}\r\n*/\r\n\r\nclass ChatSocketsModel {\r\n  final String createdAt;\r\n  final String sender;\r\n  final String receiver;\r\n  final String content;\r\n  ChatSocketsModel(\r\n      {required this.createdAt,\r\n      required this.sender,\r\n      required this.receiver,\r\n      required this.content});\r\n\r\n  factory ChatSocketsModel.fromJson(Map<dynamic, dynamic> json) {\r\n    return ChatSocketsModel(\r\n      createdAt: json['createdAt'],\r\n      sender: json['sender'],\r\n      receiver: json['receiver'],\r\n      content: json['content'],\r\n    );\r\n  }\r\n}\r\n\r\n//classe recupérée par le sockket lorsque l'utilisateur voudra envoyer un msg\r\nclass SocketParam {\r\n  SocketParam({required this.message, required this.receiver});\r\n  final String message;\r\n  final String receiver;\r\n\r\n  Map toJson() => {\r\n        'message': message,\r\n        'receiver': receiver,\r\n      };\r\n}\r\n\r\n//classe pour gérer les messages que l'utilisateur recevra en cours discussion\r\nclass NewMessageParam{\r\n  NewMessageParam({required this.message, required this.sender});\r\n  final String message;\r\n  final String sender;\r\n   factory NewMessageParam.fromJson(Map<dynamic, dynamic> json) {\r\n    return NewMessageParam(\r\n      message: json['message'],\r\n      sender: json['sender']\r\n    );\r\n  }\r\n}\r\n\r\nclass _MyHomePageState extends State<HomePage> {\r\n  //pseudo de l'utilisateur\r\n  String pseudo =\r\n      [\"steph\", \"loic\", \"loic\", \"steph\", \"loic\", \"steph\"][Random().nextInt(6)];\r\n\r\n  //variable socket qui sera utilisée pour faire toutes les transactions nécessitant les sockets\r\n  late IO.Socket socket;\r\n\r\n  List<InChatModel> mesConvData = [];\r\n\r\n  /*static final List<ChatModel> maConvData = [\r\n    ChatModel(\r\n        avatarUrl: \"img/pp.png\",\r\n        nom: \"marc\",\r\n        datetime: \"20:18\",\r\n        message: \"bonjour\",\r\n        isOnLigne: true\r\n    ),\r\n    ChatModel(\r\n        avatarUrl: \"img/pp.png\",\r\n        nom: \"jean\",\r\n        datetime: \"20:20\",\r\n        message: \"comment vas tu ?\",\r\n        isOnLigne: true\r\n    ),\r\n    ChatModel(\r\n        avatarUrl: \"img/pp.png\",\r\n        nom: \"luc\",\r\n        datetime: \"20:19\",\r\n        message: \"helloooooooo\",\r\n        isOnLigne: false\r\n    ),\r\n    ChatModel(\r\n        avatarUrl: \"img/pp.png\",\r\n        nom: \"marc3\",\r\n        datetime: \"20:50\",\r\n        message: \"hum......\",\r\n        isOnLigne: true\r\n    ),\r\n\r\n  ];*/\r\n  @override\r\n  void initState() {\r\n    // TODO: implement initState\r\n    super.initState();\r\n\r\n    connect();\r\n  }\r\n\r\n  bool verifyUsers(List<String> userList, String user) {\r\n    var _userFound = userList.firstWhereOrNull((elt) => elt == user);\r\n    if (_userFound == null) {\r\n      return false;\r\n    } else {\r\n      return true;\r\n    }\r\n  }\r\n\r\n  void connect() {\r\n    //se connecter au socet\r\n    socket = IO.io(\"http://localhost:300\", <String, dynamic>{\r\n      \"transports\": [\"websocket\"],\r\n      \"autoConnect\": false,\r\n    });\r\n    socket.connect();\r\n    //verifier si on est connecté ou pas\r\n    socket.onConnect((data) {\r\n      print(\"connected\");\r\n      //envoyer notre pseudo au socket\r\n      socket.emit(\"pseudo\", pseudo);\r\n      socket.emit(\"oldWhispers\", pseudo);\r\n\r\n      //recupère  les anciens messages et les affiche\r\n      socket.on(\"oldWhispers\", (messages) {\r\n        final List<ChatSocketsModel> listChat = [];\r\n        final List<String> listUsers = [];\r\n        final List<InChatModel> inChatList = [];\r\n        bool found;\r\n        for (final message in messages) {\r\n          var chat = ChatSocketsModel.fromJson(Map.from(message));\r\n          listChat.add(chat);\r\n          found = verifyUsers(listUsers, chat.sender);\r\n          if (!found && chat.sender != pseudo) {\r\n            listUsers.add(chat.sender);\r\n          }\r\n\r\n          found = verifyUsers(listUsers, chat.receiver);\r\n          if (!found && chat.receiver != pseudo) {\r\n            listUsers.add(chat.receiver);\r\n          }\r\n        }\r\n\r\n        //après avoir eu la liste des utilisateurs on parcours cela et on rechercher les messages\r\n        for (final user in listUsers) {\r\n          var userMessages = listChat\r\n              .where((elt) => elt.sender == user || elt.receiver == user)\r\n              .toList();\r\n          final List<MessageModel> listMessage = [];\r\n          //on parcours la liste des messages et on les transforme pour qu'ils soient du mm type que message model\r\n          for (final message in userMessages) {\r\n            var date = DateTime.parse(message.createdAt);\r\n            String formattedTime = DateFormat.Hm().format(date);\r\n            listMessage.add(MessageModel(\r\n                datetime: formattedTime,\r\n                message: message.content,\r\n                EnvMessage: message.sender != pseudo ? false : true,\r\n                etat: true));\r\n          }\r\n\r\n          //maintenant on entre les données telle qu'elles vont ètre affichées\r\n          inChatList.add(InChatModel(\r\n              avatarUrl: \"img/pp.png\",\r\n              nom: user,\r\n              listmessage: listMessage,\r\n              isOnLigne: true));\r\n        }\r\n        setState(() {\r\n          mesConvData = inChatList;\r\n        });\r\n      });\r\n\r\n      socket.on(\"whisper\", (content) {\r\n        var chatReceived = NewMessageParam.fromJson(Map.from(content));\r\n        print(mesConvData);\r\n      });\r\n\r\n      //on vérifie si il y'a un nouvel utilisateur\r\n      socket.on(\"newUser\", (pseudo) {\r\n        print(\"new user \" + pseudo);\r\n      });\r\n\r\n      // On check si le user se déconnecte\r\n      socket.on(\"quitUser\", (message) {\r\n        print(\"user quit\");\r\n      });\r\n    });\r\n\r\n    socket.onConnectError((err) => print(err));\r\n    socket.onError((err) => print(err));\r\n  }\r\n\r\n  void sendMessage(String message, String receiver) {\r\n    SocketParam newMessage = SocketParam(message: message, receiver: receiver);\r\n    socket.emit(\"newMessage\", jsonEncode(newMessage));\r\n  }\r\n\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return Scaffold(\r\n      appBar: AppBar(\r\n        title: Text(widget.title),\r\n      ),\r\n      body: ListView.builder(\r\n          itemCount: mesConvData.length, //nombre de messages dans la bd\r\n          itemBuilder: (context, index) {\r\n            InChatModel _model = mesConvData[index];\r\n            return InkWell(\r\n              onTap: () {\r\n                Navigator.push(context,\r\n                    MaterialPageRoute(builder: (BuildContext context) {\r\n                  return MyMessagePage(lechoix: _model, send: sendMessage);\r\n                }));\r\n              },\r\n              child: HomeContent(\r\n                photoprofile: _model.avatarUrl,\r\n                nom: _model.nom,\r\n                lastmessage: _model.lastMessage().message,\r\n                heurelastmessage: _model.lastMessage().datetime,\r\n                enLigne: _model.isOnLigne,\r\n              ),\r\n            );\r\n          }),\r\n    );\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/projetMessagerie/lib/ui/home.dart b/app/projetMessagerie/lib/ui/home.dart
+--- a/app/projetMessagerie/lib/ui/home.dart	(revision b9385a8762b85c7a85bada07973d3b8d6c9d041d)
++++ b/app/projetMessagerie/lib/ui/home.dart	(date 1673437078492)
+@@ -85,39 +85,82 @@
+   //variable socket qui sera utilisée pour faire toutes les transactions nécessitant les sockets
+   late IO.Socket socket;
+ 
+-  List<InChatModel> mesConvData = [];
++  //List<InChatModel> mesConvData = [];
+ 
+-  /*static final List<ChatModel> maConvData = [
+-    ChatModel(
++
++  static final List<InChatModel> mesConvDataT = [
++    InChatModel(
+         avatarUrl: "img/pp.png",
+         nom: "marc",
+-        datetime: "20:18",
+-        message: "bonjour",
+-        isOnLigne: true
++        listmessage: [
++          MessageModel(
++              datetime: "20:30",
++              message: "bonjour",
++              EnvMessage: false,
++              etat: true
++          ),
++          MessageModel(
++              datetime: "20:31",
++              message: "bonjour",
++              EnvMessage: true,
++              etat: true
++          ),
++          MessageModel(
++              datetime: "20:40",
++              message: "cava?",
++              EnvMessage: false,
++              etat: true
++          ),
++        ], isOnLigne: true
+     ),
+-    ChatModel(
++    InChatModel(
+         avatarUrl: "img/pp.png",
+         nom: "jean",
+-        datetime: "20:20",
+-        message: "comment vas tu ?",
+-        isOnLigne: true
++        listmessage: [
++          MessageModel(
++              datetime: "20:30",
++              message: "bonjour",
++              EnvMessage: true,
++              etat: true
++          ),
++          MessageModel(
++              datetime: "20:38",
++              message: "yo",
++              EnvMessage: false,
++              etat: true
++          ),
++        ], isOnLigne: true
+     ),
+-    ChatModel(
++    InChatModel(
+         avatarUrl: "img/pp.png",
+         nom: "luc",
+-        datetime: "20:19",
+-        message: "helloooooooo",
+-        isOnLigne: false
++        listmessage: [
++          MessageModel(
++              datetime: "20:35",
++              message: "bonjour",
++              EnvMessage: false,
++              etat: true
++          ),
++        ], isOnLigne: false
+     ),
+-    ChatModel(
++    InChatModel(
+         avatarUrl: "img/pp.png",
+         nom: "marc3",
+-        datetime: "20:50",
+-        message: "hum......",
+-        isOnLigne: true
++        listmessage: [
++          MessageModel(
++              datetime: "20:30",
++              message: "bonjour",
++              EnvMessage: true,
++              etat: false
++          ),
++        ], isOnLigne: true
+     ),
+ 
+-  ];*/
++  ];
++
++
++  List<InChatModel> mesConvData=mesConvDataT;
++
+   @override
+   void initState() {
+     // TODO: implement initState
+@@ -194,7 +237,7 @@
+               isOnLigne: true));
+         }
+         setState(() {
+-          mesConvData = inChatList;
++          //mesConvData = inChatList;
+         });
+       });
+ 
+@@ -249,6 +292,69 @@
+               ),
+             );
+           }),
++      floatingActionButton: Row(
++        mainAxisAlignment: MainAxisAlignment.center,
++        children: [
++          Container(
++            width: MediaQuery.of(context).size.width/1.8,
++            margin: EdgeInsets.only(left: 5,top: 5,right: 5,bottom: 5),
++            height: 65,
++            decoration: BoxDecoration(
++              color: Colors.greenAccent,
++              borderRadius: BorderRadius.circular(50),
++              boxShadow: [
++                BoxShadow(
++                  color: Colors.white,
++                  offset: Offset(
++                    0.0,
++                    10.0,
++                  ),
++                  blurRadius: 10.0,
++                  spreadRadius: -6.0,
++                ),
++              ],
++            ),
++            child: Row(
++              mainAxisAlignment: MainAxisAlignment.center,
++              children: [
++            Container(
++            width: MediaQuery.of(context).size.width/4.5,
++      margin: EdgeInsets.only(left: 5,top: 5,right: 5,bottom: 5),
++      height: 40,
++      decoration: BoxDecoration(
++        color: Colors.white,
++        borderRadius: BorderRadius.circular(50),
++      ),
++            child:                TextButton(
++              onPressed: (){},
++              child: Text("Chats",style: TextStyle(color: Colors.greenAccent),),
++              //backgroundColor: Colors.white,
++            ),),
++                Container(
++                  width: MediaQuery.of(context).size.width/4.5,
++                  margin: EdgeInsets.only(left: 5,top: 5,right: 5,bottom: 5),
++                  height: 40,
++                  decoration: BoxDecoration(
++                    color: Colors.greenAccent,
++                    borderRadius: BorderRadius.circular(50),
++                  ),
++                  child:                TextButton(
++                    onPressed: (){},
++                    child: Text("Calls",style: TextStyle(color: Colors.black),),
++                    //backgroundColor: Colors.white,
++                  ),),
++              ],
++            ),
++          ),
++          FloatingActionButton(
++            onPressed: (){
++              print("nouvelle convers");
++            },
++            child: Icon(Icons.message),
++
++          )
++        ],
++      )
+     );
+   }
+ }
+Index: app/projetMessagerie/lib/ui/homecontent.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import 'package:flutter/material.dart';\r\n\r\nclass HomeContent extends StatelessWidget {\r\n  final String photoprofile;\r\n  final String nom;\r\n  final String lastmessage;\r\n  final String heurelastmessage;\r\n  final bool enLigne;\r\n\r\n\r\n  HomeContent({\r\n    required this.photoprofile,\r\n    required this.nom,\r\n    required this.lastmessage,\r\n    required this.heurelastmessage,\r\n    required this.enLigne,\r\n  });\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return Container(\r\n      width: MediaQuery.of(context).size.width,\r\n      height: 70,\r\n      decoration: BoxDecoration(\r\n        color: Colors.grey,\r\n        borderRadius: BorderRadius.circular(0),\r\n        boxShadow: [\r\n          BoxShadow(\r\n            color: Colors.black.withOpacity(0.6),\r\n            offset: Offset(\r\n              0.0,\r\n              10.0,\r\n            ),\r\n            blurRadius: 10.0,\r\n            spreadRadius: -6.0,\r\n          ),\r\n        ],\r\n      ),\r\n      child: Row(\r\n        mainAxisAlignment: MainAxisAlignment.spaceBetween,\r\n        children: [\r\n          Row(\r\n            mainAxisAlignment: MainAxisAlignment.start,\r\n            children: [\r\n              Align(\r\n                child: Padding(\r\n                    padding: EdgeInsets.symmetric(horizontal: 5.0),\r\n                    child: Material(\r\n                      elevation: 2.0,\r\n                      shape: CircleBorder(),\r\n                      clipBehavior: Clip.hardEdge,\r\n                      color: Colors.transparent,\r\n                      child: Ink.image(\r\n                        image: AssetImage(photoprofile),\r\n                        fit: BoxFit.cover,\r\n                        width: 60,\r\n                        height: 60,\r\n                        child: InkWell(\r\n                          onTap: (){ },\r\n                        ),\r\n                      ),\r\n                    )\r\n                ),\r\n                alignment: Alignment.center,\r\n              ),\r\n              Column(\r\n                mainAxisAlignment: MainAxisAlignment.spaceEvenly,\r\n                children: [\r\n                  Align(\r\n                    child: Padding(\r\n                        padding: EdgeInsets.symmetric(horizontal: 15.0),\r\n                        child: Text(nom,\r\n                          style: TextStyle(\r\n                              fontSize: 19,\r\n                              color: Colors.black\r\n                          ),\r\n                          overflow: TextOverflow.ellipsis,\r\n                          maxLines: 5,\r\n                          textAlign: TextAlign.center,\r\n                        )\r\n                    ),\r\n                    alignment: Alignment.center,\r\n                  ),\r\n                  Align(\r\n                    child: Padding(\r\n                        padding: EdgeInsets.symmetric(horizontal: 5.0),\r\n                        child: Text(lastmessage,\r\n                          style: TextStyle(\r\n                              fontSize: 15,\r\n                              color: Colors.black45\r\n                          ),\r\n                          overflow: TextOverflow.ellipsis,\r\n                          maxLines: 5,\r\n                          textAlign: TextAlign.center,\r\n                        )\r\n                    ),\r\n                    alignment: Alignment.center,\r\n                  ),\r\n                ],\r\n              ),\r\n            ],\r\n          ),\r\n          Column(\r\n            mainAxisAlignment: MainAxisAlignment.spaceEvenly,\r\n            children: [\r\n              Align(\r\n                child: Row(\r\n                  mainAxisAlignment: MainAxisAlignment.spaceBetween,\r\n                  children: [\r\n                    Column(\r\n                      mainAxisAlignment: MainAxisAlignment.center,\r\n                      children: [\r\n                        SizedBox(width: 7),\r\n                        Text(heurelastmessage,style: TextStyle(color: Colors.black),),\r\n                      ],\r\n                    ),\r\n                  ],\r\n                ),\r\n                alignment: Alignment.bottomLeft,\r\n              ),\r\n              enLigne?Text(\"en ligne\",style: TextStyle(color: Colors.greenAccent),):Text(\"\")\r\n            ],\r\n          )\r\n\r\n        ],\r\n      ),\r\n    );\r\n  }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/projetMessagerie/lib/ui/homecontent.dart b/app/projetMessagerie/lib/ui/homecontent.dart
+--- a/app/projetMessagerie/lib/ui/homecontent.dart	(revision b9385a8762b85c7a85bada07973d3b8d6c9d041d)
++++ b/app/projetMessagerie/lib/ui/homecontent.dart	(date 1673435402358)
+@@ -21,11 +21,11 @@
+       width: MediaQuery.of(context).size.width,
+       height: 70,
+       decoration: BoxDecoration(
+-        color: Colors.grey,
++        color: Colors.white,
+         borderRadius: BorderRadius.circular(0),
+         boxShadow: [
+           BoxShadow(
+-            color: Colors.black.withOpacity(0.6),
++            color: Colors.white,
+             offset: Offset(
+               0.0,
+               10.0,
+Index: app/projetMessagerie/lib/ui/messagecontent.dart
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import 'package:flutter/material.dart';\r\n\r\nclass MessageContent extends StatelessWidget {\r\n  final String contenu;\r\n  final String heure;\r\n  final bool provenance;\r\n  final bool etat;\r\n\r\n\r\n  MessageContent({\r\n    required this.contenu,\r\n    required this.heure,\r\n    required this.provenance,\r\n    required this.etat,\r\n  });\r\n  @override\r\n  Widget build(BuildContext context) {\r\n    return Container(\r\n      margin: provenance? EdgeInsets.only(left: 60,top: 22,right: 0,bottom: 10):EdgeInsets.only(left: 0,top: 22,right: 60,bottom: 10),\r\n      width: MediaQuery.of(context).size.width,\r\n      height: 70,\r\n      decoration: BoxDecoration(\r\n        color: Colors.grey,\r\n        borderRadius: BorderRadius.circular(15),\r\n        boxShadow: [\r\n          BoxShadow(\r\n            color: Colors.black.withOpacity(0.6),\r\n            offset: Offset(\r\n              0.0,\r\n              10.0,\r\n            ),\r\n            blurRadius: 10.0,\r\n            spreadRadius: -6.0,\r\n          ),\r\n        ],\r\n      ),\r\n      child: Row(\r\n        mainAxisAlignment: MainAxisAlignment.spaceBetween,\r\n        children: [\r\n          Align(\r\n            child: Padding(\r\n                padding: EdgeInsets.symmetric(horizontal: 5.0),\r\n                child: Text(\r\n                  contenu,\r\n                  style: TextStyle(\r\n                      fontSize: 19,\r\n                      color: Colors.black\r\n                  ),\r\n                  overflow: TextOverflow.ellipsis,\r\n                  maxLines: 5,\r\n                  textAlign: TextAlign.center,\r\n                )\r\n            ),\r\n            alignment: Alignment.center,\r\n          ),\r\n          Align(\r\n            child: Row(\r\n              mainAxisAlignment: MainAxisAlignment.spaceBetween,\r\n              children: [\r\n                Container(\r\n                  padding: EdgeInsets.all(5),\r\n                  margin: EdgeInsets.all(5),\r\n                  /*decoration: BoxDecoration(\r\n                    color: Colors.black.withOpacity(0.4),\r\n                    borderRadius: BorderRadius.circular(15),\r\n                  ),*/\r\n                  child: Row(\r\n                    mainAxisAlignment: MainAxisAlignment.end,\r\n                    children: [\r\n                      SizedBox(width: 7),\r\n                      Text(heure,style: TextStyle(color: Colors.black),),\r\n                      !provenance? Text(\"\"):etat? Icon(Icons.check,color: Colors.blue,):Icon(Icons.check,color: Colors.black45,),\r\n\r\n\r\n                    ],\r\n                  ),\r\n                ),\r\n              ],\r\n            ),\r\n            alignment: Alignment.bottomLeft,\r\n          ),\r\n        ],\r\n      ),\r\n    );\r\n  }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/projetMessagerie/lib/ui/messagecontent.dart b/app/projetMessagerie/lib/ui/messagecontent.dart
+--- a/app/projetMessagerie/lib/ui/messagecontent.dart	(revision b9385a8762b85c7a85bada07973d3b8d6c9d041d)
++++ b/app/projetMessagerie/lib/ui/messagecontent.dart	(date 1673437171638)
+@@ -15,72 +15,79 @@
+   });
+   @override
+   Widget build(BuildContext context) {
+-    return Container(
+-      margin: provenance? EdgeInsets.only(left: 60,top: 22,right: 0,bottom: 10):EdgeInsets.only(left: 0,top: 22,right: 60,bottom: 10),
+-      width: MediaQuery.of(context).size.width,
+-      height: 70,
+-      decoration: BoxDecoration(
+-        color: Colors.grey,
+-        borderRadius: BorderRadius.circular(15),
+-        boxShadow: [
+-          BoxShadow(
+-            color: Colors.black.withOpacity(0.6),
+-            offset: Offset(
+-              0.0,
+-              10.0,
+-            ),
+-            blurRadius: 10.0,
+-            spreadRadius: -6.0,
+-          ),
+-        ],
+-      ),
+-      child: Row(
+-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+-        children: [
+-          Align(
+-            child: Padding(
+-                padding: EdgeInsets.symmetric(horizontal: 5.0),
+-                child: Text(
+-                  contenu,
+-                  style: TextStyle(
+-                      fontSize: 19,
+-                      color: Colors.black
+-                  ),
+-                  overflow: TextOverflow.ellipsis,
+-                  maxLines: 5,
+-                  textAlign: TextAlign.center,
+-                )
+-            ),
+-            alignment: Alignment.center,
+-          ),
+-          Align(
+-            child: Row(
+-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+-              children: [
+-                Container(
+-                  padding: EdgeInsets.all(5),
+-                  margin: EdgeInsets.all(5),
+-                  /*decoration: BoxDecoration(
++
++    return Column(
++      mainAxisAlignment: MainAxisAlignment.center,
++      children: [
++        Container(
++          margin: provenance? EdgeInsets.only(left: 60,top: 22,right: 0,bottom: 0):EdgeInsets.only(left: 0,top: 22,right: 60,bottom: 0),
++          width: MediaQuery.of(context).size.width,
++          height: 70,
++          decoration: BoxDecoration(
++            color: provenance?Colors.greenAccent.shade100:Colors.white,
++            borderRadius:provenance? BorderRadius.only(topLeft:Radius.circular(50),topRight:Radius.circular(50),bottomLeft:Radius.circular(50),):BorderRadius.only(topLeft:Radius.circular(50),topRight:Radius.circular(50),bottomRight:Radius.circular(50),),
++            border: provenance?Border.all(color: Colors.greenAccent.shade100):Border.all(color: Colors.black),
++            boxShadow: [
++              BoxShadow(
++                color: Colors.white,
++                offset: Offset(
++                  0.0,
++                  10.0,
++                ),
++                blurRadius: 10.0,
++                spreadRadius: -6.0,
++              ),
++            ],
++          ),
++          child: Row(
++            mainAxisAlignment: MainAxisAlignment.spaceBetween,
++            children: [
++              Align(
++                child: Padding(
++                    padding: EdgeInsets.symmetric(horizontal: 15.0),
++                    child: Text(
++                      contenu,
++                      style: TextStyle(
++                          fontSize: 19,
++                          color: Colors.black
++                      ),
++                      overflow: TextOverflow.ellipsis,
++                      maxLines: 5,
++                      textAlign: TextAlign.center,
++                    )
++                ),
++                alignment: Alignment.center,
++              ),
++              Align(
++                child: Row(
++                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
++                  children: [
++                    Container(
++                      padding: EdgeInsets.all(7),
++                      margin: EdgeInsets.all(5),
++                      /*decoration: BoxDecoration(
+                     color: Colors.black.withOpacity(0.4),
+                     borderRadius: BorderRadius.circular(15),
+                   ),*/
+-                  child: Row(
+-                    mainAxisAlignment: MainAxisAlignment.end,
+-                    children: [
+-                      SizedBox(width: 7),
+-                      Text(heure,style: TextStyle(color: Colors.black),),
+-                      !provenance? Text(""):etat? Icon(Icons.check,color: Colors.blue,):Icon(Icons.check,color: Colors.black45,),
++                      child: Row(
++                        mainAxisAlignment: MainAxisAlignment.end,
++                        children: [
++                          SizedBox(width: 7),
++                          Text(heure,style: TextStyle(color: Colors.black),),
++                          !provenance? Text(""):etat? Icon(Icons.check,color: Colors.blue,):Icon(Icons.check,color: Colors.black45,),
+ 
+ 
+-                    ],
+-                  ),
+-                ),
+-              ],
+-            ),
+-            alignment: Alignment.bottomLeft,
+-          ),
+-        ],
+-      ),
++                        ],
++                      ),
++                    ),
++                  ],
++                ),
++                alignment: Alignment.bottomLeft,
++              ),
++            ],
++          ),
++        )
++      ],
+     );
+   }
+ }
+\ No newline at end of file

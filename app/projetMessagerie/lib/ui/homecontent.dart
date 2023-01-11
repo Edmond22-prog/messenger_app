@@ -21,11 +21,11 @@ class HomeContent extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       height: 70,
       decoration: BoxDecoration(
-        color: Colors.grey,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.6),
+            color: Colors.white,
             offset: Offset(
               0.0,
               10.0,

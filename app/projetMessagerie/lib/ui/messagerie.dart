@@ -263,6 +263,7 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
           padding: const EdgeInsets.only(bottom: 55),
           itemCount: lechoisie.listmessage.length,//nombre de messages dans la bd
           itemBuilder: (context,index){
+
             return InkWell(
                 onLongPress: (){
                   //selection
