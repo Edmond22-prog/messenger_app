@@ -44,8 +44,8 @@ class MessageContent extends StatelessWidget {
           //height: 40,
           decoration: BoxDecoration(
             color: provenance?Colors.greenAccent.shade100:Colors.white,
-            borderRadius:provenance? BorderRadius.only(topLeft:Radius.circular(30),topRight:Radius.circular(30),bottomLeft:Radius.circular(30),):BorderRadius.only(topLeft:Radius.circular(30),topRight:Radius.circular(30),bottomRight:Radius.circular(30),),
-            border: provenance?Border.all(color: Colors.greenAccent.shade100):Border.all(color: Colors.black),
+            borderRadius:provenance? BorderRadius.only(topLeft:Radius.circular(30),topRight:Radius.circular(30),bottomLeft:Radius.circular(30),bottomRight:Radius.circular(10)):BorderRadius.only(topLeft:Radius.circular(30),topRight:Radius.circular(30),bottomRight:Radius.circular(30),bottomLeft:Radius.circular(10)),
+            border: provenance?Border.all(color: Colors.greenAccent.shade100):Border.all(color: Colors.black12),
             boxShadow: [
               BoxShadow(
                 color: Colors.white,
@@ -70,7 +70,8 @@ class MessageContent extends StatelessWidget {
                         contenu,
                         style: TextStyle(
                             fontSize: 19,
-                            color: Colors.black
+                            color: Colors.black,
+                            fontStyle: FontStyle.italic,
                         ),
                       ),
                     )
@@ -82,7 +83,7 @@ class MessageContent extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(7),
+                      padding: EdgeInsets.only(top: 20,right: 5),
                       margin: EdgeInsets.all(5),
                       /*decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.4),

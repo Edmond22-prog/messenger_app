@@ -161,7 +161,7 @@ class _MyHomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
 
-    //mesConvData = mesConvDatat;
+   // mesConvData = mesConvDatat;
 
     connect();
   }
@@ -267,7 +267,46 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        backgroundColor: Colors.white,
+        leadingWidth: 20,
+        foregroundColor: Colors.black,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text("Chats",
+                  style: TextStyle(color: Colors.black),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,),
+                Container(
+                    margin: EdgeInsets.only(left: 10,),
+                    width: 25,
+                    height: 25,
+                    decoration: BoxDecoration(
+                      color: Colors.greenAccent,
+                      borderRadius:BorderRadius.circular(50),
+                    ),
+                    child: Text("0",//nombre de messages
+                      style: TextStyle(color: Colors.white,fontSize: 18),
+                      textAlign: TextAlign.center,
+                    )
+                ),
+              ],
+            ),//nom de la personne
+          ],
+        ),
+        actions: [
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.camera_alt,color: Colors.black,)
+          ),
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.search,color: Colors.black,)
+          ),
+          //Icon(Icons.search,color: Colors.black,)
+        ],
       ),
       body: ListView.builder(
           itemCount: mesConvData.length, //nombre de messages dans la bd

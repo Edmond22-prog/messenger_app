@@ -233,6 +233,9 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        leadingWidth: 20,
+          foregroundColor: Colors.black,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -244,8 +247,8 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
                 child: Ink.image(
                   image: AssetImage(lechoisie.avatarUrl),//id.photoprofil
                   fit: BoxFit.cover,
-                  width: 40,
-                  height: 40,
+                  width: 35,
+                  height: 35,
                   child: InkWell(
                     onTap: (){ },
                   ),
@@ -254,26 +257,28 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
               Column(
                 children: [
                   Text(lechoisie.nom,
+                    style: TextStyle(color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,),
-                  lechoisie.isOnLigne?Text("en ligne",style: TextStyle(color: Colors.greenAccent,fontSize: 12),):Text("")
+                  lechoisie.isOnLigne?Text("en ligne",style: TextStyle(color: Colors.black45,fontSize: 12),):Text("")
                 ],
               ),//nom de la personne
-              Row(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(left: 130,top: 5,right: 5,bottom: 5),
-                    child: IconButton(
-                      onPressed: () {
-
-                      },
-                      icon: Icon(Icons.call),
-                    ),
-                  )
-                ],
-              )
             ],
+          ),
+        actions: [
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.call,color: Colors.greenAccent,)
+          ),
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.videocam,color: Colors.blueAccent,)
+          ),
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.search,color: Colors.black,)
           )
+        ],
       ),
       body: ListView.builder(
           padding: const EdgeInsets.only(bottom: 55),
@@ -298,6 +303,8 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
 
       floatingActionButton: BottomAppBar(
         child: Container(
+            margin:EdgeInsets.only(left: 5,right: 5),
+
             color: Colors.green.withOpacity(0.1),
             child: Row(
                 children: [

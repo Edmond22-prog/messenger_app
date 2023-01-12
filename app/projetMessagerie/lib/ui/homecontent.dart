@@ -43,7 +43,7 @@ class HomeContent extends StatelessWidget {
             children: [
               Align(
                 child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: Material(
                       elevation: 2.0,
                       shape: CircleBorder(),
@@ -52,8 +52,8 @@ class HomeContent extends StatelessWidget {
                       child: Ink.image(
                         image: AssetImage(photoprofile),
                         fit: BoxFit.cover,
-                        width: 60,
-                        height: 60,
+                        width: 50,
+                        height: 50,
                         child: InkWell(
                           onTap: (){ },
                         ),
@@ -127,7 +127,8 @@ class HomeContent extends StatelessWidget {
               ),
               enLigne?Text("en ligne",style: TextStyle(color: Colors.greenAccent),):Text("")
             ],
-          )
+          ),
+          SizedBox(width: 2),
 
         ],
       ),
