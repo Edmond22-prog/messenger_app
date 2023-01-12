@@ -256,7 +256,7 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
               ),Text("  "),
               Column(
                 children: [
-                  Text(lechoisie.nom,
+                  Text(lechoisie.nom[0].toUpperCase() + lechoisie.nom.substring(1),
                     style: TextStyle(color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,),

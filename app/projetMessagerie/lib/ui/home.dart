@@ -161,7 +161,7 @@ class _MyHomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
 
-   // mesConvData = mesConvDatat;
+    //mesConvData = mesConvDatat;
 
     connect();
   }
@@ -267,6 +267,8 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0.5,
+        shadowColor: Colors.white,
         backgroundColor: Colors.white,
         leadingWidth: 20,
         foregroundColor: Colors.black,
@@ -274,9 +276,10 @@ class _MyHomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text("Chats",
-                  style: TextStyle(color: Colors.black),
+                  style: TextStyle(color: Colors.black,fontSize: 25),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,),
                 Container(
@@ -299,35 +302,55 @@ class _MyHomePageState extends State<HomePage> {
         actions: [
           IconButton(
               onPressed: (){},
-              icon: Icon(Icons.camera_alt,color: Colors.black,)
+              icon: Icon(Icons.camera_alt_outlined,color: Colors.black,)
           ),
+          SizedBox(width: 5),
           IconButton(
               onPressed: (){},
               icon: Icon(Icons.search,color: Colors.black,)
           ),
-          //Icon(Icons.search,color: Colors.black,)
+          SizedBox(width: 10),
+          Material(
+            elevation: 2.0,
+            shape: CircleBorder(),
+            clipBehavior: Clip.hardEdge,
+            color: Colors.transparent,
+            child: Ink.image(
+              image: AssetImage("img/pp.png"),//id.photoprofil
+              fit: BoxFit.contain,
+              width: 25,
+              height: 25,
+              child: InkWell(
+                onTap: (){ },
+              ),
+            ),
+          ),
+          SizedBox(width: 10),
         ],
       ),
-      body: ListView.builder(
-          itemCount: mesConvData.length, //nombre de messages dans la bd
-          itemBuilder: (context, index) {
-            InChatModel _model = mesConvData[index];
-            return InkWell(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (BuildContext context) {
-                      return MyMessagePage(lechoix: _model);
-                    }));
-              },
-              child: HomeContent(
-                photoprofile: _model.avatarUrl,
-                nom: _model.nom,
-                lastmessage: _model.lastMessage().message,
-                heurelastmessage: _model.lastMessage().datetime,
-                enLigne: _model.isOnLigne,
-              ),
-            );
-          }),
+      body: Container(
+        child: ListView.builder(
+            padding: const EdgeInsets.only(bottom: 55),
+            itemCount: mesConvData.length, //nombre de messages dans la bd
+            itemBuilder: (context, index) {
+              InChatModel _model = mesConvData[index];
+              return InkWell(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (BuildContext context) {
+                        return MyMessagePage(lechoix: _model);
+                      }));
+                },
+                child: HomeContent(
+                  photoprofile: _model.avatarUrl,
+                  nom: _model.nom,
+                  lastmessage: _model.lastMessage().message,
+                  heurelastmessage: _model.lastMessage().datetime,
+                  enLigne: _model.isOnLigne,
+                ),
+              );
+            }),
+      ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

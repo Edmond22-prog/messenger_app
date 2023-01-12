@@ -66,29 +66,29 @@ class HomeContent extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Container(
-                    margin: EdgeInsets.only(left: 5,top: 5,right: 150,bottom: 5),
+                    width: 200,
+                    //margin: EdgeInsets.only(right: 70),
                     child: Align(
                       child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 15.0),
-                          child: Text(nom,
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text(nom[0].toUpperCase() + nom.substring(1),
                             style: TextStyle(
                                 fontSize: 19,
                                 color: Colors.black
                             ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 5,
                             textAlign: TextAlign.start,
                           )
                       ),
-                      alignment: Alignment.center,
+                      alignment: Alignment.topLeft,
                     ),
                   ),
                   Container(
+                    width: 200,
                     child: Align(
                       child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 25.0),
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
                           child: SizedBox(
-                            //width: 70,
+                            width: 100,
                             child: Text(lastmessage,
                               style: TextStyle(
                                   fontSize: 15,
@@ -100,7 +100,7 @@ class HomeContent extends StatelessWidget {
                             ),
                           )
                       ),
-                      alignment: Alignment.center,
+                      alignment: Alignment.topLeft,
                     ),
                   )
                 ],
@@ -125,10 +125,9 @@ class HomeContent extends StatelessWidget {
                 ),
                 alignment: Alignment.bottomLeft,
               ),
-              enLigne?Text("en ligne",style: TextStyle(color: Colors.greenAccent),):Text("")
+              enLigne?Text("en ligne    ",style: TextStyle(color: Colors.greenAccent),):Text("en ligne    ",style: TextStyle(color: Colors.white))
             ],
           ),
-          SizedBox(width: 2),
 
         ],
       ),
