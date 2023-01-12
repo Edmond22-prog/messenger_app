@@ -85,40 +85,83 @@ class _MyHomePageState extends State<HomePage> {
 
   List<InChatModel> mesConvData = [];
 
-  /*static final List<ChatModel> maConvData = [
-    ChatModel(
+ /* static final List<InChatModel> mesConvDatat = [
+    InChatModel(
         avatarUrl: "img/pp.png",
         nom: "marc",
-        datetime: "20:18",
-        message: "bonjour",
-        isOnLigne: true
+        listmessage: [
+          MessageModel(
+              datetime: "20:30",
+              message: "bonjour",
+              EnvMessage: false,
+              etat: true
+          ),
+          MessageModel(
+              datetime: "20:31",
+              message: "bonjour",
+              EnvMessage: true,
+              etat: true
+          ),
+          MessageModel(
+              datetime: "20:40",
+              message: "cava?",
+              EnvMessage: false,
+              etat: true
+          ),
+        ], isOnLigne: true
     ),
-    ChatModel(
+    InChatModel(
         avatarUrl: "img/pp.png",
         nom: "jean",
-        datetime: "20:20",
-        message: "comment vas tu ?",
-        isOnLigne: true
+        listmessage: [
+          MessageModel(
+              datetime: "20:30",
+              message: "bonjour",
+              EnvMessage: true,
+              etat: true
+          ),
+          MessageModel(
+              datetime: "20:38",
+              message: "yo",
+              EnvMessage: false,
+              etat: true
+          ),
+        ], isOnLigne: true
     ),
-    ChatModel(
+    InChatModel(
         avatarUrl: "img/pp.png",
         nom: "luc",
-        datetime: "20:19",
-        message: "helloooooooo",
-        isOnLigne: false
+        listmessage: [
+          MessageModel(
+              datetime: "20:35",
+              message: "bonjour",
+              EnvMessage: false,
+              etat: true
+          ),
+        ], isOnLigne: false
     ),
-    ChatModel(
+    InChatModel(
         avatarUrl: "img/pp.png",
         nom: "marc3",
-        datetime: "20:50",
-        message: "hum......",
-        isOnLigne: true
+        listmessage: [
+          MessageModel(
+              datetime: "20:30",
+              message: "bonjour",
+              EnvMessage: true,
+              etat: false
+          ),
+        ], isOnLigne: true
     ),
   ];*/
+
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    //mesConvData = mesConvDatat;
 
     connect();
   }
@@ -246,6 +289,96 @@ class _MyHomePageState extends State<HomePage> {
               ),
             );
           }),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            //margin: EdgeInsets.only(left: 0,top: 22,right: 60,bottom: 0),
+            width: MediaQuery.of(context).size.width/2,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.greenAccent,
+              borderRadius:BorderRadius.circular(50),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.white,
+                  offset: Offset(
+                    0.0,
+                    10.0,
+                  ),
+                  blurRadius: 10.0,
+                  spreadRadius: -6.0,
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(left: 5,top: 5,right: 5,bottom: 5),
+                  width: MediaQuery.of(context).size.width/4.5,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: chat?Colors.white:Colors.greenAccent,
+                    borderRadius:BorderRadius.circular(50),
+
+                  ),
+                  child: TextButton(
+                      onPressed: (){
+                        setState(() {
+                          call=false;
+                          chat=true;
+                        });
+                      },
+                      child: Text("chats",style: TextStyle(color: chat?Colors.greenAccent:Colors.black,fontSize: 18),)
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(left: 5,top: 5,right: 5,bottom: 5),
+                  width: MediaQuery.of(context).size.width/4.5,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: call?Colors.white:Colors.greenAccent,
+                    borderRadius:BorderRadius.circular(50),
+
+                  ),
+                  child: TextButton(
+                      onPressed: (){
+                        setState(() {
+                          call=true;
+                          chat=false;
+                        });
+                      },
+                      child: Text("calls",style: TextStyle(color: call?Colors.greenAccent:Colors.black,fontSize: 18),)
+                  ),
+                )
+              ],
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 5,top: 5,right: 5,bottom: 5),
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.greenAccent,
+              borderRadius:BorderRadius.circular(50),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.white,
+                  offset: Offset(
+                    0.0,
+                    10.0,
+                  ),
+                  blurRadius: 10.0,
+                  spreadRadius: -6.0,
+                ),
+              ],
+            ),
+            child: Icon(Icons.message,color: Colors.white,size: 30,)
+          ),
+        ],
+      ),
     );
   }
+  bool call=false;
+  bool chat=true;
 }

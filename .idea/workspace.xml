@@ -5,25 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="600ca170-401a-4df9-93cb-7766f92f7c8d" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/messenger_app.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/projetMessagerie/lib/ui/home.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/lib/ui/home.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/lib/ui/homecontent.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/lib/ui/homecontent.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/lib/ui/messagecontent.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/lib/ui/messagecontent.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/lib/ui/messagerie.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/lib/ui/messagerie.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/lib/ui/src/widgets/record_button.dart" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/lib/ui/src/widgets/record_button.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/linux/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/linux/flutter/generated_plugin_registrant.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/linux/flutter/generated_plugins.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/windows/flutter/generated_plugin_registrant.h" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/windows/flutter/generated_plugin_registrant.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/projetMessagerie/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/app/projetMessagerie/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +29,7 @@
     <property name="cidr.known.project.marker" value="true" />
     <property name="dart.analysis.tool.window.visible" value="false" />
     <property name="io.flutter.reload.alreadyRun" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/projetMessagerie" />
     <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
@@ -88,5 +72,6 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>

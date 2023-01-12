@@ -132,18 +132,19 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
   }
   void sendMessage() {
 
-    DateTime sendDate = new DateTime.now();
-    dateEnvoie = sendDate.toString();
-    int h=sendDate.hour;
-    int m=sendDate.minute;
+    setState(() {
+      DateTime sendDate = new DateTime.now();
+      dateEnvoie = sendDate.toString();
+      int h = sendDate.hour;
+      int m = sendDate.minute;
 
-    heureEnvoie = h.toString()+":"+m.toString();
+      heureEnvoie = h.toString() + ":" + m.toString();
 
-    lechoisie.add(heureEnvoie, message);
+      lechoisie.add(heureEnvoie, message);
 
-
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=> super.widget));
-    print('Message send...');
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=> super.widget));
+      print('Message send...');
+    });
   }
 
 
