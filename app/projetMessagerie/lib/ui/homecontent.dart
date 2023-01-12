@@ -65,36 +65,44 @@ class HomeContent extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Align(
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Text(nom,
-                          style: TextStyle(
-                              fontSize: 19,
-                              color: Colors.black
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 5,
-                          textAlign: TextAlign.center,
-                        )
+                  Container(
+                    margin: EdgeInsets.only(left: 5,top: 5,right: 150,bottom: 5),
+                    child: Align(
+                      child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 15.0),
+                          child: Text(nom,
+                            style: TextStyle(
+                                fontSize: 19,
+                                color: Colors.black
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 5,
+                            textAlign: TextAlign.start,
+                          )
+                      ),
+                      alignment: Alignment.center,
                     ),
-                    alignment: Alignment.center,
                   ),
-                  Align(
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5.0),
-                        child: Text(lastmessage,
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black45
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 5,
-                          textAlign: TextAlign.center,
-                        )
+                  Container(
+                    child: Align(
+                      child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 25.0),
+                          child: SizedBox(
+                            //width: 70,
+                            child: Text(lastmessage,
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black45
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              textAlign: TextAlign.start,
+                            ),
+                          )
+                      ),
+                      alignment: Alignment.center,
                     ),
-                    alignment: Alignment.center,
-                  ),
+                  )
                 ],
               ),
             ],

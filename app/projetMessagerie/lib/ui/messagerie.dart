@@ -253,10 +253,25 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
               ),Text("  "),
               Column(
                 children: [
-                  Text(lechoisie.nom),
+                  Text(lechoisie.nom,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,),
                   lechoisie.isOnLigne?Text("en ligne",style: TextStyle(color: Colors.greenAccent,fontSize: 12),):Text("")
                 ],
-              )//nom de la personne
+              ),//nom de la personne
+              Row(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(left: 130,top: 5,right: 5,bottom: 5),
+                    child: IconButton(
+                      onPressed: () {
+
+                      },
+                      icon: Icon(Icons.call),
+                    ),
+                  )
+                ],
+              )
             ],
           )
       ),

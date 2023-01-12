@@ -85,7 +85,7 @@ class _MyHomePageState extends State<HomePage> {
 
   List<InChatModel> mesConvData = [];
 
- /* static final List<InChatModel> mesConvDatat = [
+  /*static final List<InChatModel> mesConvDatat = [
     InChatModel(
         avatarUrl: "img/pp.png",
         nom: "marc",
