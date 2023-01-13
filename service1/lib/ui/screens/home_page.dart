@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  final String userID;
+  final String pseudo;
   final String phoneNumber;
 
-  const HomePage({super.key, required this.userID, required this.phoneNumber});
+  const HomePage({super.key, required this.pseudo, required this.phoneNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -14,9 +14,9 @@ class HomePage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text('User ID:',
+              const Text('Pseudo:',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              Text(userID, style: const TextStyle(fontSize: 20)),
+              Text(pseudo, style: const TextStyle(fontSize: 20)),
             ],
           ),
           Row(
@@ -28,16 +28,15 @@ class HomePage extends StatelessWidget {
             ],
           ),
           Container(
-            margin: const EdgeInsets.only(top: 50),
-            child: const Text(
-              'Connected',
-              style: TextStyle(
-                color: Colors.green,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            )
-          ),
+              margin: const EdgeInsets.only(top: 50),
+              child: const Text(
+                'Connected',
+                style: TextStyle(
+                  color: Colors.green,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              )),
         ]),
       ),
     );

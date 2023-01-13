@@ -3,15 +3,11 @@ import 'package:get/get.dart';
 import 'package:phone_authentication/controllers/authentication/register_controller.dart';
 import 'package:phone_authentication/ui/screens/verification_page.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
 
-  @override
-  State<RegisterPage> createState() => _RegisterPageState();
-}
-
-class _RegisterPageState extends State<RegisterPage> {
-  // Value who will contain the phone number and user id
+class RegisterPage1 extends StatelessWidget {
+  RegisterPage1({Key? key}) : super(key: key);
+  
+  // Value who will contain the phone number
   final _controller = Get.put(RegisterController());
 
   @override
@@ -27,29 +23,12 @@ class _RegisterPageState extends State<RegisterPage> {
             Container(
               margin: EdgeInsets.only(top: height / 10),
               child: Center(
-                child: Text('Registration',
+                child: Text('Phone Verification',
                     style: TextStyle(
                       color: Colors.blue,
                       fontSize: width / 15,
                       fontWeight: FontWeight.bold,
                     )),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(
-                  top: width / 10, right: width / 10, left: width / 10),
-              child: TextField(
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'User ID',
-                  hintText: 'Enter your user id',
-                  prefixIcon: Icon(Icons.person),
-                ),
-                keyboardType: TextInputType.name,
-                controller: _controller.userID,
-                onChanged: (value) {
-                  debugPrint(value);
-                },
               ),
             ),
             Container(
@@ -88,8 +67,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     .phoneAuthentication(_controller.phoneNumber.text.trim());
                 // Navigate to the verification page
                 Get.to(() => VerificationPage(
-                    userID: _controller.userID.text,
-                    phoneNumber: _controller.phoneNumber.text));
+                  phoneNumber: _controller.phoneNumber.text));
               },
               child: const Text('Next'),
             ),

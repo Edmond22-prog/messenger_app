@@ -4,11 +4,10 @@ import 'package:phone_authentication/controllers/authentication/verification_con
 import 'package:pinput/pinput.dart';
 
 class VerificationPage extends StatefulWidget {
-  final String userID;
   final String phoneNumber;
 
   const VerificationPage(
-      {super.key, required this.userID, required this.phoneNumber});
+      {super.key, required this.phoneNumber});
 
   @override
   State<VerificationPage> createState() => _VerificationPageState();
@@ -30,7 +29,7 @@ class _VerificationPageState extends State<VerificationPage> {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
-    var otp;
+    var otp = "";
 
     // Variables for pin theme
     const focusedBorderColor = Colors.amber;
@@ -81,7 +80,7 @@ class _VerificationPageState extends State<VerificationPage> {
                   otp = pin;
                 });
                 Get.put(VerificationController())
-                    .verifyOTP(widget.userID, widget.phoneNumber, otp);
+                    .verifyOTP(widget.phoneNumber, otp);
               },
               onChanged: (value) {
                 debugPrint('onChanged: $value');
@@ -127,9 +126,9 @@ class _VerificationPageState extends State<VerificationPage> {
               ),
               onPressed: () {
                 Get.put(VerificationController())
-                    .verifyOTP(widget.userID, widget.phoneNumber, otp);
+                    .verifyOTP(widget.phoneNumber, otp);
               },
-              child: const Text('Sign In'),
+              child: const Text('Next'),
             ),
           ),
         ],
