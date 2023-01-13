@@ -1,60 +1,82 @@
-
-
 import 'dart:async';
 import 'dart:io';
 
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:projetmessagerie/ui/messagecontent.dart';
 import 'package:projetmessagerie/ui/src/widgets/record_button.dart';
 import 'package:record/record.dart';
+import 'package:intl/intl.dart';
+
+//classe pour gérer les messages que l'utilisateur recevra en cours discussion
+class NewMessageParam {
+  NewMessageParam({Key? key, required this.message, required this.sender});
+  final String message;
+  final String sender;
+  factory NewMessageParam.fromJson(Map<dynamic, dynamic> json) {
+    return NewMessageParam(message: json['message'], sender: json['sender']);
+  }
+}
 
 class MyMessagePage extends StatefulWidget {
-  const MyMessagePage({super.key, required this.lechoix});
+  const MyMessagePage(
+      {Key? key,
+      required this.lechoix,
+      required this.send,
+      required this.setMsg,
+      required this.socket});
 
   final InChatModel lechoix;
+  final Function send;
+  final Function setMsg;
+  final IO.Socket socket;
 
   @override
   State<MyMessagePage> createState() => _MessagePageState();
-
 }
+
 ///////////////////////////////
-class InChatModel{
+class InChatModel {
   final String avatarUrl;
   final String nom;
   final List<MessageModel> listmessage;
 
   final bool isOnLigne;
 
-  InChatModel({required this.avatarUrl, required this.nom, required this.listmessage, required this.isOnLigne});
+  InChatModel(
+      {required this.avatarUrl,
+      required this.nom,
+      required this.listmessage,
+      required this.isOnLigne});
 
-  void add(String date,String message){
-    listmessage.add(new MessageModel(datetime:date,message:message,EnvMessage:true,etat: false));
+  void add(String date, String message) {
+    listmessage.add(new MessageModel(
+        datetime: date, message: message, EnvMessage: true, etat: false));
   }
-  MessageModel lastMessage(){
+
+  MessageModel lastMessage() {
     return listmessage.last;
   }
 }
-class MessageModel{
+
+class MessageModel {
   final String datetime;
   final String message;
-  final bool EnvMessage;//false = je recois   true = j'envoie le message
-  final bool etat;//false = message envoiyé  true = message reçu
+  final bool EnvMessage; //false = je recois   true = j'envoie le message
+  final bool etat; //false = message envoiyé  true = message reçu
 
-  MessageModel({required this.datetime, required this.message, required this.EnvMessage, required this.etat});
-
+  MessageModel(
+      {required this.datetime,
+      required this.message,
+      required this.EnvMessage,
+      required this.etat});
 }
 
-
-
-class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderStateMixin{
-
-
-
-
-
-  late InChatModel lechoisie ;
+class _MessagePageState extends State<MyMessagePage>
+    with SingleTickerProviderStateMixin {
+  late InChatModel lechoisie;
 /*
   void verifChoisi(InChatModel lechois){
     lechoisie=lechois;
@@ -66,16 +88,7 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
   }
 */
 
-
-
-
-
-
-
-
-
-
-  DateTime? startTime;
+   DateTime? startTime;
   Timer? timer;
   String recordDuration = "00:00";
   //late Record record;
@@ -84,28 +97,36 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
   bool isLocked = false;
   bool showLottie = false;
 
-
-
-  String message="";
-  String heureEnvoie="";
-  String dateEnvoie="";
+  String message = "";
+  String heureEnvoie = "";
+  String dateEnvoie = "";
 
   late AnimationController controller;
 
   @override
   void initState() {
-    super.initState();
+     super.initState();
+    //variable socket qui sera utilisée pour faire toutes les transactions nécessitant les sockets
     controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
 
-
-    voiceState=true;
-
+    voiceState = true;
 
     lechoisie = widget.lechoix;
-    //verifChoisi();
+
+    widget.socket.on("whisper", (content) {
+      print("je reçois ici");
+      var chatReceived = NewMessageParam.fromJson(Map.from(content));
+      var date = DateTime.now();
+      print("j'ai reçu le msg de "+ chatReceived.sender + " qui est" +chatReceived.message);
+      String formattedTime = DateFormat.Hm().format(date);
+      setState(() {
+        lechoisie = widget.lechoix;
+      });
+      //type = "sender" équivaut au pseudo qui envoi le msg  à user et type="receiver"
+    });
   }
 
   @override
@@ -113,7 +134,6 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
     controller.dispose();
     super.dispose();
   }
-
 
   void callEmoji() {
     print('Emoji Icon Pressed...');
@@ -130,25 +150,16 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
   void callVoice() {
     print('Voice Icon Pressed...');
   }
+
   void sendMessage() {
-
     setState(() {
-      DateTime sendDate = new DateTime.now();
-      dateEnvoie = sendDate.toString();
-      int h = sendDate.hour;
-      int m = sendDate.minute;
-
-      heureEnvoie = h.toString() + ":" + m.toString();
-
-      lechoisie.add(heureEnvoie, message);
-
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=> super.widget));
-      print('Message send...');
+      final setMessage = widget.setMsg;
+      final send = widget.send;
+      setMessage(lechoisie.nom, message, "sender");
+      send(message, lechoisie.nom);
+     // lechoisie=widget.lechoix;
     });
   }
-
-
-
 
   Widget moodIcon() {
     return IconButton(
@@ -177,17 +188,19 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
         onPressed: () {
           pickImage(ImageSource.camera);
           callCamera();
-        }
-    );
+        });
   }
 
-  bool voiceState =true;
+  bool voiceState = true;
   Widget voiceIcon() {
-    return RecordButton(controller: controller);/*const Icon(
+    return RecordButton(
+        controller:
+            controller); /*const Icon(
   Icons.keyboard_voice,
   color: Colors.black,
   );*/
   }
+
   Widget voiceIcontexte() {
     return const Icon(
       Icons.send,
@@ -195,39 +208,36 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
     );
   }
 
-  Widget modeText(){
+  Widget modeText() {
     return Row(
       children: [
         moodIcon(),
         Expanded(
             child: Container(
-              child:TextField(
-                onChanged: (val){setState(() {
-                  if(val==""){
-                    voiceState=true;
-                  }else{
-                    voiceState=false;
-                  }
-                  message=val;
-                });
-                },
-                decoration: InputDecoration(
-                    hintText: "Message",
-                    hintStyle: TextStyle(color: Colors.black),
-                    border: InputBorder.none
-                ),
-                maxLines: 5,
-                minLines: 1,
-              ),
-            )
-        ),
+          child: TextField(
+            onChanged: (val) {
+              setState(() {
+                if (val == "") {
+                  voiceState = true;
+                } else {
+                  voiceState = false;
+                }
+                message = val;
+              });
+            },
+            decoration: InputDecoration(
+                hintText: "Message",
+                hintStyle: TextStyle(color: Colors.black),
+                border: InputBorder.none),
+            maxLines: 5,
+            minLines: 1,
+          ),
+        )),
         attachFile(),
         camera(),
       ],
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -235,57 +245,72 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
       appBar: AppBar(
         backgroundColor: Colors.white,
         leadingWidth: 20,
-          foregroundColor: Colors.black,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Material(
-                elevation: 2.0,
-                shape: CircleBorder(),
-                clipBehavior: Clip.hardEdge,
-                color: Colors.transparent,
-                child: Ink.image(
-                  image: AssetImage(lechoisie.avatarUrl),//id.photoprofil
-                  fit: BoxFit.cover,
-                  width: 35,
-                  height: 35,
-                  child: InkWell(
-                    onTap: (){ },
-                  ),
+        foregroundColor: Colors.black,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Material(
+              elevation: 2.0,
+              shape: CircleBorder(),
+              clipBehavior: Clip.hardEdge,
+              color: Colors.transparent,
+              child: Ink.image(
+                image: AssetImage(lechoisie.avatarUrl), //id.photoprofil
+                fit: BoxFit.cover,
+                width: 35,
+                height: 35,
+                child: InkWell(
+                  onTap: () {},
                 ),
-              ),Text("  "),
-              Column(
-                children: [
-                  Text(lechoisie.nom[0].toUpperCase() + lechoisie.nom.substring(1),
-                    style: TextStyle(color: Colors.black),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,),
-                  lechoisie.isOnLigne?Text("en ligne",style: TextStyle(color: Colors.black45,fontSize: 12),):Text("")
-                ],
-              ),//nom de la personne
-            ],
-          ),
+              ),
+            ),
+            Text("  "),
+            Column(
+              children: [
+                Text(
+                  lechoisie.nom[0].toUpperCase() + lechoisie.nom.substring(1),
+                  style: TextStyle(color: Colors.black),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                lechoisie.isOnLigne
+                    ? Text(
+                        "en ligne",
+                        style: TextStyle(color: Colors.black45, fontSize: 12),
+                      )
+                    : Text("")
+              ],
+            ), //nom de la personne
+          ],
+        ),
         actions: [
           IconButton(
-              onPressed: (){},
-              icon: Icon(Icons.call,color: Colors.greenAccent,)
-          ),
+              onPressed: () {},
+              icon: Icon(
+                Icons.call,
+                color: Colors.greenAccent,
+              )),
           IconButton(
-              onPressed: (){},
-              icon: Icon(Icons.videocam,color: Colors.blueAccent,)
-          ),
+              onPressed: () {},
+              icon: Icon(
+                Icons.videocam,
+                color: Colors.blueAccent,
+              )),
           IconButton(
-              onPressed: (){},
-              icon: Icon(Icons.search,color: Colors.black,)
-          )
+              onPressed: () {},
+              icon: Icon(
+                Icons.search,
+                color: Colors.black,
+              ))
         ],
       ),
       body: ListView.builder(
           padding: const EdgeInsets.only(bottom: 55),
-          itemCount: lechoisie.listmessage.length,//nombre de messages dans la bd
-          itemBuilder: (context,index){
+          itemCount:
+              lechoisie.listmessage.length, //nombre de messages dans la bd
+          itemBuilder: (context, index) {
             return InkWell(
-                onLongPress: (){
+                onLongPress: () {
                   //selection
                 },
                 child: MessageContent(
@@ -293,80 +318,68 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
                   heure: lechoisie.listmessage[index].datetime,
                   provenance: lechoisie.listmessage[index].EnvMessage,
                   etat: lechoisie.listmessage[index].etat,
-                )
-            );
-
+                ));
           }),
-
-
-
       floatingActionButton: BottomAppBar(
         child: Container(
-            margin:EdgeInsets.only(left: 5,right: 5),
-
+            margin: EdgeInsets.only(left: 5, right: 5),
             color: Colors.green.withOpacity(0.1),
-            child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(35.0),
-                        boxShadow: const [
-                          BoxShadow(
-                              offset: Offset(0, 2),
-                              blurRadius: 7,
-                              color: Colors.grey)
-                        ],
-                      ),
-                      child: modeText(),
-                    ),
+            child: Row(children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(35.0),
+                    boxShadow: const [
+                      BoxShadow(
+                          offset: Offset(0, 2),
+                          blurRadius: 7,
+                          color: Colors.grey)
+                    ],
                   ),
-                  const SizedBox(width: 15),
-                  Container(
-                    padding: const EdgeInsets.all(15.0),
-                    decoration: const BoxDecoration(
-                        color: Color(0xFF00BFA5), shape: BoxShape.circle),
-                    child: InkWell(
-                      child: voiceState ? voiceIcon():voiceIcontexte(),
-
-                      onTap: (){
-                        if(!voiceState){
-                          sendMessage();
-                        }
-                      },
-                    ),
-                  )
-                ]
-            )
-        ),
-      ),floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+                  child: modeText(),
+                ),
+              ),
+              const SizedBox(width: 15),
+              Container(
+                padding: const EdgeInsets.all(15.0),
+                decoration: const BoxDecoration(
+                    color: Color(0xFF00BFA5), shape: BoxShape.circle),
+                child: InkWell(
+                  child: voiceState ? voiceIcon() : voiceIcontexte(),
+                  onTap: () {
+                    if (!voiceState) {
+                      sendMessage();
+                    }
+                  },
+                ),
+              )
+            ])),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-
-
-
-
-  Future<Null> dialog()async{
-    return showDialog(context: context,
+  Future<Null> dialog() async {
+    return showDialog(
+        context: context,
         barrierDismissible: true,
-        builder: (BuildContext context){
+        builder: (BuildContext context) {
           return Center(
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(35.0),
               ),
-              width: MediaQuery.of(context).size.width/1.1,
-              height: MediaQuery.of(context).size.height/3,
+              width: MediaQuery.of(context).size.width / 1.1,
+              height: MediaQuery.of(context).size.height / 3,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Icon( Icons.file_open, size: 50),
+                      Icon(Icons.file_open, size: 50),
                       Icon(Icons.camera, size: 50),
                       Icon(Icons.filter, size: 50)
                     ],
@@ -388,7 +401,6 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
 
   Future pickImage(ImageSource imageSource) async {
     try {
-
       final image = await ImagePicker().pickImage(source: imageSource);
       if (image == null) return;
 
@@ -401,11 +413,4 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
       print("Failed to pick image $e");
     }
   }
-
-
-
 }
-
-
-
-
