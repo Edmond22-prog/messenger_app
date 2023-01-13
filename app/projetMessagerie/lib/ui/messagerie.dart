@@ -11,10 +11,9 @@ import 'package:projetmessagerie/ui/src/widgets/record_button.dart';
 import 'package:record/record.dart';
 
 class MyMessagePage extends StatefulWidget {
-  const MyMessagePage({super.key, required this.lechoix, required this.send});
+  const MyMessagePage({super.key, required this.lechoix});
 
   final InChatModel lechoix;
-  final Function send ;
 
   @override
   State<MyMessagePage> createState() => _MessagePageState();
@@ -33,7 +32,6 @@ class InChatModel{
   void add(String date,String message){
     listmessage.add(new MessageModel(datetime:date,message:message,EnvMessage:true,etat: false));
   }
-
   MessageModel lastMessage(){
     return listmessage.last;
   }
@@ -134,20 +132,19 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
   }
   void sendMessage() {
 
-    DateTime sendDate = new DateTime.now();
-    dateEnvoie = sendDate.toString();
-    int h=sendDate.hour;
-    int m=sendDate.minute;
+    setState(() {
+      DateTime sendDate = new DateTime.now();
+      dateEnvoie = sendDate.toString();
+      int h = sendDate.hour;
+      int m = sendDate.minute;
 
-    heureEnvoie = h.toString()+":"+m.toString();
+      heureEnvoie = h.toString() + ":" + m.toString();
 
-    lechoisie.add(heureEnvoie, message);
+      lechoisie.add(heureEnvoie, message);
 
-
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=> super.widget));
-    print('Message send...');
-    final send = widget.send;
-    send(message,lechoisie.nom);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=> super.widget));
+      print('Message send...');
+    });
   }
 
 
@@ -236,6 +233,9 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        leadingWidth: 20,
+          foregroundColor: Colors.black,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -247,8 +247,8 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
                 child: Ink.image(
                   image: AssetImage(lechoisie.avatarUrl),//id.photoprofil
                   fit: BoxFit.cover,
-                  width: 40,
-                  height: 40,
+                  width: 35,
+                  height: 35,
                   child: InkWell(
                     onTap: (){ },
                   ),
@@ -256,12 +256,29 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
               ),Text("  "),
               Column(
                 children: [
-                  Text(lechoisie.nom),
-                  lechoisie.isOnLigne?Text("en ligne",style: TextStyle(color: Colors.greenAccent,fontSize: 12),):Text("")
+                  Text(lechoisie.nom[0].toUpperCase() + lechoisie.nom.substring(1),
+                    style: TextStyle(color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,),
+                  lechoisie.isOnLigne?Text("en ligne",style: TextStyle(color: Colors.black45,fontSize: 12),):Text("")
                 ],
-              )//nom de la personne
+              ),//nom de la personne
             ],
+          ),
+        actions: [
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.call,color: Colors.greenAccent,)
+          ),
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.videocam,color: Colors.blueAccent,)
+          ),
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.search,color: Colors.black,)
           )
+        ],
       ),
       body: ListView.builder(
           padding: const EdgeInsets.only(bottom: 55),
@@ -285,6 +302,8 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
 
       floatingActionButton: BottomAppBar(
         child: Container(
+            margin:EdgeInsets.only(left: 5,right: 5),
+
             color: Colors.green.withOpacity(0.1),
             child: Row(
                 children: [

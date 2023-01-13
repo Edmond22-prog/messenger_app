@@ -21,11 +21,11 @@ class HomeContent extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       height: 70,
       decoration: BoxDecoration(
-        color: Colors.grey,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.6),
+            color: Colors.white,
             offset: Offset(
               0.0,
               10.0,
@@ -43,7 +43,7 @@ class HomeContent extends StatelessWidget {
             children: [
               Align(
                 child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: Material(
                       elevation: 2.0,
                       shape: CircleBorder(),
@@ -52,8 +52,8 @@ class HomeContent extends StatelessWidget {
                       child: Ink.image(
                         image: AssetImage(photoprofile),
                         fit: BoxFit.cover,
-                        width: 60,
-                        height: 60,
+                        width: 50,
+                        height: 50,
                         child: InkWell(
                           onTap: (){ },
                         ),
@@ -65,36 +65,44 @@ class HomeContent extends StatelessWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Align(
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Text(nom,
-                          style: TextStyle(
-                              fontSize: 19,
-                              color: Colors.black
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 5,
-                          textAlign: TextAlign.center,
-                        )
+                  Container(
+                    width: 200,
+                    //margin: EdgeInsets.only(right: 70),
+                    child: Align(
+                      child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text(nom[0].toUpperCase() + nom.substring(1),
+                            style: TextStyle(
+                                fontSize: 19,
+                                color: Colors.black
+                            ),
+                            textAlign: TextAlign.start,
+                          )
+                      ),
+                      alignment: Alignment.topLeft,
                     ),
-                    alignment: Alignment.center,
                   ),
-                  Align(
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5.0),
-                        child: Text(lastmessage,
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black45
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 5,
-                          textAlign: TextAlign.center,
-                        )
+                  Container(
+                    width: 200,
+                    child: Align(
+                      child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          child: SizedBox(
+                            width: 100,
+                            child: Text(lastmessage,
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black45
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              textAlign: TextAlign.start,
+                            ),
+                          )
+                      ),
+                      alignment: Alignment.topLeft,
                     ),
-                    alignment: Alignment.center,
-                  ),
+                  )
                 ],
               ),
             ],
@@ -117,9 +125,9 @@ class HomeContent extends StatelessWidget {
                 ),
                 alignment: Alignment.bottomLeft,
               ),
-              enLigne?Text("en ligne",style: TextStyle(color: Colors.greenAccent),):Text("")
+              enLigne?Text("en ligne    ",style: TextStyle(color: Colors.greenAccent),):Text("en ligne    ",style: TextStyle(color: Colors.white))
             ],
-          )
+          ),
 
         ],
       ),

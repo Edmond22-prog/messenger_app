@@ -18,7 +18,6 @@ class HomePage extends StatefulWidget {
 }
 
 ///////////////////////////////
-
 /*
 class ChatModel{
   final String avatarUrl;
@@ -26,7 +25,6 @@ class ChatModel{
   final String datetime;
   final String message;
   final bool isOnLigne;
-
   ChatModel({required this.avatarUrl, required this.nom, required this.datetime, required this.message, required this.isOnLigne});
 }
 */
@@ -38,9 +36,9 @@ class ChatSocketsModel {
   final String content;
   ChatSocketsModel(
       {required this.createdAt,
-      required this.sender,
-      required this.receiver,
-      required this.content});
+        required this.sender,
+        required this.receiver,
+        required this.content});
 
   factory ChatSocketsModel.fromJson(Map<dynamic, dynamic> json) {
     return ChatSocketsModel(
@@ -59,9 +57,9 @@ class SocketParam {
   final String receiver;
 
   Map toJson() => {
-        'message': message,
-        'receiver': receiver,
-      };
+    'message': message,
+    'receiver': receiver,
+  };
 }
 
 //classe pour gérer les messages que l'utilisateur recevra en cours discussion
@@ -69,10 +67,10 @@ class NewMessageParam{
   NewMessageParam({required this.message, required this.sender});
   final String message;
   final String sender;
-   factory NewMessageParam.fromJson(Map<dynamic, dynamic> json) {
+  factory NewMessageParam.fromJson(Map<dynamic, dynamic> json) {
     return NewMessageParam(
-      message: json['message'],
-      sender: json['sender']
+        message: json['message'],
+        sender: json['sender']
     );
   }
 }
@@ -80,48 +78,90 @@ class NewMessageParam{
 class _MyHomePageState extends State<HomePage> {
   //pseudo de l'utilisateur
   String pseudo =
-      ["steph", "loic", "loic", "steph", "loic", "steph"][Random().nextInt(6)];
+  ["steph", "loic", "loic", "steph", "loic", "steph"][Random().nextInt(6)];
 
   //variable socket qui sera utilisée pour faire toutes les transactions nécessitant les sockets
   late IO.Socket socket;
 
   List<InChatModel> mesConvData = [];
 
-  /*static final List<ChatModel> maConvData = [
-    ChatModel(
+  /*static final List<InChatModel> mesConvDatat = [
+    InChatModel(
         avatarUrl: "img/pp.png",
         nom: "marc",
-        datetime: "20:18",
-        message: "bonjour",
-        isOnLigne: true
+        listmessage: [
+          MessageModel(
+              datetime: "20:30",
+              message: "bonjour",
+              EnvMessage: false,
+              etat: true
+          ),
+          MessageModel(
+              datetime: "20:31",
+              message: "bonjour",
+              EnvMessage: true,
+              etat: true
+          ),
+          MessageModel(
+              datetime: "20:40",
+              message: "cava?",
+              EnvMessage: false,
+              etat: true
+          ),
+        ], isOnLigne: true
     ),
-    ChatModel(
+    InChatModel(
         avatarUrl: "img/pp.png",
         nom: "jean",
-        datetime: "20:20",
-        message: "comment vas tu ?",
-        isOnLigne: true
+        listmessage: [
+          MessageModel(
+              datetime: "20:30",
+              message: "bonjour",
+              EnvMessage: true,
+              etat: true
+          ),
+          MessageModel(
+              datetime: "20:38",
+              message: "yo",
+              EnvMessage: false,
+              etat: true
+          ),
+        ], isOnLigne: true
     ),
-    ChatModel(
+    InChatModel(
         avatarUrl: "img/pp.png",
         nom: "luc",
-        datetime: "20:19",
-        message: "helloooooooo",
-        isOnLigne: false
+        listmessage: [
+          MessageModel(
+              datetime: "20:35",
+              message: "bonjour",
+              EnvMessage: false,
+              etat: true
+          ),
+        ], isOnLigne: false
     ),
-    ChatModel(
+    InChatModel(
         avatarUrl: "img/pp.png",
         nom: "marc3",
-        datetime: "20:50",
-        message: "hum......",
-        isOnLigne: true
+        listmessage: [
+          MessageModel(
+              datetime: "20:30",
+              message: "bonjour",
+              EnvMessage: true,
+              etat: false
+          ),
+        ], isOnLigne: true
     ),
-
   ];*/
+
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    //mesConvData = mesConvDatat;
 
     connect();
   }
@@ -227,28 +267,180 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: ListView.builder(
-          itemCount: mesConvData.length, //nombre de messages dans la bd
-          itemBuilder: (context, index) {
-            InChatModel _model = mesConvData[index];
-            return InkWell(
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (BuildContext context) {
-                  return MyMessagePage(lechoix: _model, send: sendMessage);
-                }));
-              },
-              child: HomeContent(
-                photoprofile: _model.avatarUrl,
-                nom: _model.nom,
-                lastmessage: _model.lastMessage().message,
-                heurelastmessage: _model.lastMessage().datetime,
-                enLigne: _model.isOnLigne,
+        elevation: 0.5,
+        shadowColor: Colors.white,
+        backgroundColor: Colors.white,
+        leadingWidth: 20,
+        foregroundColor: Colors.black,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Chats",
+                  style: TextStyle(color: Colors.black,fontSize: 25),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,),
+                Container(
+                    margin: EdgeInsets.only(left: 10,),
+                    width: 25,
+                    height: 25,
+                    decoration: BoxDecoration(
+                      color: Colors.greenAccent,
+                      borderRadius:BorderRadius.circular(50),
+                    ),
+                    child: Text("0",//nombre de messages
+                      style: TextStyle(color: Colors.white,fontSize: 18),
+                      textAlign: TextAlign.center,
+                    )
+                ),
+              ],
+            ),//nom de la personne
+          ],
+        ),
+        actions: [
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.camera_alt_outlined,color: Colors.black,)
+          ),
+          SizedBox(width: 5),
+          IconButton(
+              onPressed: (){},
+              icon: Icon(Icons.search,color: Colors.black,)
+          ),
+          SizedBox(width: 10),
+          Material(
+            elevation: 2.0,
+            shape: CircleBorder(),
+            clipBehavior: Clip.hardEdge,
+            color: Colors.transparent,
+            child: Ink.image(
+              image: AssetImage("img/pp.png"),//id.photoprofil
+              fit: BoxFit.contain,
+              width: 25,
+              height: 25,
+              child: InkWell(
+                onTap: (){ },
               ),
-            );
-          }),
+            ),
+          ),
+          SizedBox(width: 10),
+        ],
+      ),
+      body: Container(
+        child: ListView.builder(
+            padding: const EdgeInsets.only(bottom: 55),
+            itemCount: mesConvData.length, //nombre de messages dans la bd
+            itemBuilder: (context, index) {
+              InChatModel _model = mesConvData[index];
+              return InkWell(
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (BuildContext context) {
+                        return MyMessagePage(lechoix: _model);
+                      }));
+                },
+                child: HomeContent(
+                  photoprofile: _model.avatarUrl,
+                  nom: _model.nom,
+                  lastmessage: _model.lastMessage().message,
+                  heurelastmessage: _model.lastMessage().datetime,
+                  enLigne: _model.isOnLigne,
+                ),
+              );
+            }),
+      ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            //margin: EdgeInsets.only(left: 0,top: 22,right: 60,bottom: 0),
+            width: MediaQuery.of(context).size.width/2,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.greenAccent,
+              borderRadius:BorderRadius.circular(50),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.white,
+                  offset: Offset(
+                    0.0,
+                    10.0,
+                  ),
+                  blurRadius: 10.0,
+                  spreadRadius: -6.0,
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(left: 5,top: 5,right: 5,bottom: 5),
+                  width: MediaQuery.of(context).size.width/4.5,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: chat?Colors.white:Colors.greenAccent,
+                    borderRadius:BorderRadius.circular(50),
+
+                  ),
+                  child: TextButton(
+                      onPressed: (){
+                        setState(() {
+                          call=false;
+                          chat=true;
+                        });
+                      },
+                      child: Text("chats",style: TextStyle(color: chat?Colors.greenAccent:Colors.black,fontSize: 18),)
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(left: 5,top: 5,right: 5,bottom: 5),
+                  width: MediaQuery.of(context).size.width/4.5,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: call?Colors.white:Colors.greenAccent,
+                    borderRadius:BorderRadius.circular(50),
+
+                  ),
+                  child: TextButton(
+                      onPressed: (){
+                        setState(() {
+                          call=true;
+                          chat=false;
+                        });
+                      },
+                      child: Text("calls",style: TextStyle(color: call?Colors.greenAccent:Colors.black,fontSize: 18),)
+                  ),
+                )
+              ],
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 5,top: 5,right: 5,bottom: 5),
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.greenAccent,
+              borderRadius:BorderRadius.circular(50),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.white,
+                  offset: Offset(
+                    0.0,
+                    10.0,
+                  ),
+                  blurRadius: 10.0,
+                  spreadRadius: -6.0,
+                ),
+              ],
+            ),
+            child: Icon(Icons.message,color: Colors.white,size: 30,)
+          ),
+        ],
+      ),
     );
   }
+  bool call=false;
+  bool chat=true;
 }

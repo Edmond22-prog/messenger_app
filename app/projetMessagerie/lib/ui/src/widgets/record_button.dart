@@ -25,6 +25,18 @@ class RecordButton extends StatefulWidget {
 }
 
 class _RecordButtonState extends State<RecordButton> {
+
+  String message="";
+  String heureEnvoie="";
+  String dateEnvoie="";
+
+
+
+
+
+
+
+
   static const double size = 55;
 
   final double lockerHeight = 200;
@@ -318,6 +330,23 @@ class _RecordButtonState extends State<RecordButton> {
           Globals.audioListKey.currentState
               ?.insertItem(AudioState.files.length - 1);
           debugPrint(filePath);
+
+
+
+          DateTime sendDate = new DateTime.now();
+          dateEnvoie = sendDate.toString();
+          int h=sendDate.hour;
+          int m=sendDate.minute;
+
+          heureEnvoie = h.toString()+":"+m.toString();
+
+          //lechoisie.add(heureEnvoie, message);
+
+
+          //Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=> super.widget));
+          print('voice send...');
+
+
         }
       },
       onLongPressCancel: () {
