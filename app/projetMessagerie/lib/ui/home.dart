@@ -8,13 +8,13 @@ import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.title});
+class HomeConvPage extends StatefulWidget {
+  const HomeConvPage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<HomePage> createState() => _MyHomePageState();
+  State<HomeConvPage> createState() => _MyHomePageState();
 }
 
 ///////////////////////////////
@@ -75,7 +75,7 @@ class NewMessageParam{
   }
 }
 
-class _MyHomePageState extends State<HomePage> {
+class _MyHomePageState extends State<HomeConvPage> {
   //pseudo de l'utilisateur
   String pseudo =
   ["steph", "loic", "loic", "steph", "loic", "steph"][Random().nextInt(6)];
@@ -267,6 +267,7 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Icon(Icons.back_hand_rounded,color: Colors.white,),
         elevation: 0.5,
         shadowColor: Colors.white,
         backgroundColor: Colors.white,
