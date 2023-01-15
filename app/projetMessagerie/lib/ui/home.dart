@@ -175,6 +175,22 @@ class _MyHomePageState extends State<HomePage> {
     }
   }
 
+  void setMessage(String user,String message , String type){
+      print("user is"+ user);
+      print("message is"+ message);
+      var date =  DateTime.now();
+      String formattedTime = DateFormat.Hm().format(date);
+      //type = "sender" équivaut au pseudo qui envoi le msg  à user et type="receiver"
+      for(int i = 0; i < mesConvData.length; i++){
+              if(mesConvData[i].nom == user){
+                print("enter here");
+                setState((){
+                  mesConvData[i].listmessage.add(MessageModel(datetime: formattedTime, message:message, EnvMessage: type=="sender"?true:false, etat: true));
+                });
+              }
+          }
+    }
+
   void connect() {
     //se connecter au socet
     socket = IO.io("http://localhost:300", <String, dynamic>{
@@ -238,9 +254,10 @@ class _MyHomePageState extends State<HomePage> {
         });
       });
 
-      socket.on("whisper", (content) {
+        socket.on("whisper", (content) {
+        print("we are receiving the message");
         var chatReceived = NewMessageParam.fromJson(Map.from(content));
-        print(mesConvData);
+        setMessage(chatReceived.sender,chatReceived.message,"receiver");
       });
 
       //on vérifie si il y'a un nouvel utilisateur
@@ -258,7 +275,8 @@ class _MyHomePageState extends State<HomePage> {
     socket.onError((err) => print(err));
   }
 
-  void sendMessage(String message, String receiver) {
+ void sendMessage(String message, String receiver) {
+    print("we are sending the message");
     SocketParam newMessage = SocketParam(message: message, receiver: receiver);
     socket.emit("newMessage", jsonEncode(newMessage));
   }
@@ -338,7 +356,7 @@ class _MyHomePageState extends State<HomePage> {
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (BuildContext context) {
-                        return MyMessagePage(lechoix: _model);
+                        return MyMessagePage(key:UniqueKey(),lechoix: _model, send: sendMessage, setMsg: setMessage, socket:socket);
                       }));
                 },
                 child: HomeContent(
