@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:projetmessagerie/ui/home.dart';
 import 'package:projetmessagerie/ui/messagecontent.dart';
 import 'package:projetmessagerie/ui/src/widgets/record_button.dart';
 import 'package:record/record.dart';
@@ -234,6 +235,14 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (BuildContext context) {
+                  return HomeConvPage(title: 'Message Me');
+                }));
+          },
+          icon: Icon(Icons.arrow_back,),),
         leadingWidth: 20,
           foregroundColor: Colors.black,
           title: Row(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:projetmessagerie/ui/contactlist.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:projetmessagerie/ui/homecontent.dart';
 import 'package:projetmessagerie/ui/messagerie.dart';
@@ -436,7 +437,16 @@ class _MyHomePageState extends State<HomeConvPage> {
                 ),
               ],
             ),
-            child: Icon(Icons.message,color: Colors.white,size: 30,)
+            child: IconButton(
+              onPressed: () {
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (BuildContext context) {
+                    return ListContacts();
+                  })
+                );
+              },
+              icon: Icon(Icons.message,color: Colors.white,size: 30,),
+            )
           ),
         ],
       ),
