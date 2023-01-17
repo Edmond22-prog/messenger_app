@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:projetmessagerie/authentification/controllers/authentication/register_controller.dart';
-import 'package:projetmessagerie/authentification/models/user.dart';
+
+import '../../../controllers/authentication/register_controller.dart';
+import '../../../models/user.dart';
 
 class RegisterPage2 extends StatelessWidget {
   final String phoneNumber;

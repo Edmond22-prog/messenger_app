@@ -1,9 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:projetmessagerie/authentification/models/user.dart';
-import 'package:projetmessagerie/authentification/repositories/authentication_repository.dart';
-import 'package:projetmessagerie/authentification/repositories/user_repository.dart';
-import 'package:projetmessagerie/authentification/ui/screens/home_page.dart';
+import 'package:projetmessagerie/ui/pages/auth/home_page.dart';
+
+import '../../models/user.dart';
+import '../../repositories/authentication_repository.dart';
+import '../../repositories/user_repository.dart';
 
 class RegisterController extends GetxController {
   static RegisterController get instance => Get.find();

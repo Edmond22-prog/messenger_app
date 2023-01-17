@@ -6,8 +6,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:projetmessagerie/ui/home.dart';
-import 'package:projetmessagerie/ui/messagecontent.dart';
+import 'package:projetmessagerie/ui/pages/home.dart';
+import 'package:projetmessagerie/ui/pages/messagecontent.dart';
 import 'package:projetmessagerie/ui/src/widgets/record_button.dart';
 import 'package:record/record.dart';
 
@@ -239,7 +239,7 @@ class _MessagePageState extends State<MyMessagePage> with SingleTickerProviderSt
           onPressed: () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (BuildContext context) {
-                  return HomeConvPage(title: 'Message Me');
+                  return HomeConvPage(pseudo: "",number: "",);
                 }));
           },
           icon: Icon(Icons.arrow_back,),),

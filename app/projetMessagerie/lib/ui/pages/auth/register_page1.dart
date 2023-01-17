@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:projetmessagerie/authentification/controllers/authentication/register_controller.dart';
-import 'package:projetmessagerie/authentification/ui/screens/verification_page.dart';
+import 'package:projetmessagerie/ui/pages/auth/verification_page.dart';
+
+import '../../../controllers/authentication/register_controller.dart';
 
 
 class RegisterPage1 extends StatelessWidget {

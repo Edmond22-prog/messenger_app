@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:projetmessagerie/ui/messagerie.dart';
+import 'package:projetmessagerie/ui/pages/messagerie.dart';
 
 class ListContacts extends StatefulWidget {
   @override

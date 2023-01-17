@@ -7,7 +7,6 @@ class HomeContent extends StatelessWidget {
   final String heurelastmessage;
   final bool enLigne;
 
-
   HomeContent({
     required this.photoprofile,
     required this.nom,
@@ -15,6 +14,7 @@ class HomeContent extends StatelessWidget {
     required this.heurelastmessage,
     required this.enLigne,
   });
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -55,11 +55,10 @@ class HomeContent extends StatelessWidget {
                         width: 50,
                         height: 50,
                         child: InkWell(
-                          onTap: (){ },
+                          onTap: () {},
                         ),
                       ),
-                    )
-                ),
+                    )),
                 alignment: Alignment.center,
               ),
               Column(
@@ -71,14 +70,11 @@ class HomeContent extends StatelessWidget {
                     child: Align(
                       child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text(nom[0].toUpperCase() + nom.substring(1),
-                            style: TextStyle(
-                                fontSize: 19,
-                                color: Colors.black
-                            ),
+                          child: Text(
+                            nom[0].toUpperCase() + nom.substring(1),
+                            style: TextStyle(fontSize: 19, color: Colors.black),
                             textAlign: TextAlign.start,
-                          )
-                      ),
+                          )),
                       alignment: Alignment.topLeft,
                     ),
                   ),
@@ -89,17 +85,15 @@ class HomeContent extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: 10.0),
                           child: SizedBox(
                             width: 100,
-                            child: Text(lastmessage,
+                            child: Text(
+                              lastmessage,
                               style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black45
-                              ),
+                                  fontSize: 15, color: Colors.black45),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               textAlign: TextAlign.start,
                             ),
-                          )
-                      ),
+                          )),
                       alignment: Alignment.topLeft,
                     ),
                   )
@@ -118,17 +112,24 @@ class HomeContent extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(width: 7),
-                        Text(heurelastmessage,style: TextStyle(color: Colors.black),),
+                        Text(
+                          heurelastmessage,
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ],
                     ),
                   ],
                 ),
                 alignment: Alignment.bottomLeft,
               ),
-              enLigne?Text("en ligne    ",style: TextStyle(color: Colors.greenAccent),):Text("en ligne    ",style: TextStyle(color: Colors.white))
+              enLigne
+                  ? Text(
+                      "en ligne    ",
+                      style: TextStyle(color: Colors.greenAccent),
+                    )
+                  : Text("en ligne    ", style: TextStyle(color: Colors.white))
             ],
           ),
-
         ],
       ),
     );

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
-import 'package:projetmessagerie/authentification/controllers/authentication/verification_controller.dart';
+
+import '../../../controllers/authentication/verification_controller.dart';
 
 class VerificationPage extends StatefulWidget {
   final String phoneNumber;

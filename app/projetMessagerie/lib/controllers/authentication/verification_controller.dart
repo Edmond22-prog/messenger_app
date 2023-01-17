@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
-import 'package:projetmessagerie/authentification/repositories/authentication_repository.dart';
-import 'package:projetmessagerie/authentification/ui/screens/register_page2.dart';
+import 'package:projetmessagerie/ui/pages/auth/register_page2.dart';
+
+import '../../repositories/authentication_repository.dart';
 
 class VerificationController extends GetxController {
   static VerificationController get instance => Get.find();

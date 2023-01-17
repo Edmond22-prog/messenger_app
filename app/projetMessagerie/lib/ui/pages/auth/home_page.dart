@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projetmessagerie/ui/home.dart';
+import 'package:projetmessagerie/ui/pages/home.dart';
 
 class HomePage extends StatelessWidget {
   final String pseudo;
@@ -34,7 +34,7 @@ class HomePage extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (BuildContext context) {
-                        return HomeConvPage(title: 'Message Me');
+                        return HomeConvPage(pseudo: pseudo, number: phoneNumber,);
                       }));
                 },
                 child: const Text(
