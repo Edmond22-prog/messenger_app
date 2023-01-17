@@ -7,9 +7,15 @@ const io=new Server(server);
 const multer = require("multer");
 const bodyParser = require("body-parser");
 const path = require("path");
+require('dotenv').config();
 const ObjectId=mongoose.Types.ObjectId;
+mongoose.set('strictQuery', true);
+const url= process.env.ATLAS_URL;
 mongoose.connect(
-    "mongodb://0.0.0.0:27017/ChatSocket",
+    
+    
+    //"mongodb+srv://sielo:mwKdIMddgkaVK7i7@cluster0.eg97lsb.mongodb.net/?retryWrites=true&w=majority",
+    url,
     {
          useNewUrlParser: true, useUnifiedTopology: true},
         (err)=>{
@@ -333,4 +339,8 @@ app.post("/api/uploadFile", upload.single("myFile"), async (req, res) => {
 
 
 
-server.listen(300,()=>console.log("server start!"));
+
+
+const {PORT=300} = process.env;  // 
+
+server.listen(PORT, () => console.log(`server start! PORT:${PORT}`))
