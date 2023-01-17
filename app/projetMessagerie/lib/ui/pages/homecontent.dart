@@ -7,7 +7,7 @@ class HomeContent extends StatelessWidget {
   final String heurelastmessage;
   final bool enLigne;
 
-  HomeContent({
+  const HomeContent({super.key, 
     required this.photoprofile,
     required this.nom,
     required this.lastmessage,
@@ -23,7 +23,7 @@ class HomeContent extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(0),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.white,
             offset: Offset(

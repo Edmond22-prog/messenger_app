@@ -10,7 +10,6 @@ import 'package:intl/intl.dart';
 
 import '../../models/chat_socket_model.dart';
 import '../../models/new_message_param.dart';
-import '../../models/socket_param.dart';
 
 class HomeConvPage extends StatefulWidget {
   const HomeConvPage({super.key, required this.pseudo, required this.number});
@@ -21,7 +20,6 @@ class HomeConvPage extends StatefulWidget {
   @override
   State<HomeConvPage> createState() => _MyHomePageState();
 }
-
 
 class _MyHomePageState extends State<HomeConvPage> {
   //pseudo de l'utilisateur
@@ -46,6 +44,26 @@ class _MyHomePageState extends State<HomeConvPage> {
       return false;
     } else {
       return true;
+    }
+  }
+
+  void setMessage(String user, String message, String type) {
+    debugPrint("user is $user");
+    debugPrint("message is $message");
+    var date = DateTime.now();
+    String formattedTime = DateFormat.Hm().format(date);
+    //type = "sender" équivaut au pseudo qui envoi le msg  à user et type="receiver"
+    for (int i = 0; i < mesConvData.length; i++) {
+      if (mesConvData[i].nom == user) {
+        print("enter here");
+        setState(() {
+          mesConvData[i].listmessage.add(MessageModel(
+              datetime: formattedTime,
+              message: message,
+              EnvMessage: type == "sender" ? true : false,
+              etat: true));
+        });
+      }
     }
   }
 
@@ -114,8 +132,9 @@ class _MyHomePageState extends State<HomeConvPage> {
       });
 
       socket.on("whisper", (content) {
+        debugPrint("we are receiving the message");
         var chatReceived = NewMessageParam.fromJson(Map.from(content));
-        debugPrint("$mesConvData");
+        setMessage(chatReceived.sender, chatReceived.message, "receiver");
       });
 
       //on vérifie si il y'a un nouvel utilisateur
@@ -133,10 +152,10 @@ class _MyHomePageState extends State<HomeConvPage> {
     socket.onError((err) => debugPrint(err));
   }
 
-  void sendMessage(String message, String receiver) {
+/*   void sendMessage(String message, String receiver) {
     SocketParam newMessage = SocketParam(message: message, receiver: receiver);
     socket.emit("newMessage", jsonEncode(newMessage));
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +244,8 @@ class _MyHomePageState extends State<HomeConvPage> {
               onTap: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                  return MyMessagePage(lechoix: model);
+                  return MyMessagePage(
+                      lechoix: model, socket: socket, setMsg: setMessage);
                 }));
               },
               child: HomeContent(
@@ -262,7 +282,8 @@ class _MyHomePageState extends State<HomeConvPage> {
             child: Row(
               children: [
                 Container(
-                  margin: const EdgeInsets.only(left: 5, top: 5, right: 5, bottom: 5),
+                  margin: const EdgeInsets.only(
+                      left: 5, top: 5, right: 5, bottom: 5),
                   width: MediaQuery.of(context).size.width / 4.5,
                   height: 40,
                   decoration: BoxDecoration(
@@ -284,7 +305,8 @@ class _MyHomePageState extends State<HomeConvPage> {
                       )),
                 ),
                 Container(
-                  margin: const EdgeInsets.only(left: 5, top: 5, right: 5, bottom: 5),
+                  margin: const EdgeInsets.only(
+                      left: 5, top: 5, right: 5, bottom: 5),
                   width: MediaQuery.of(context).size.width / 4.5,
                   height: 40,
                   decoration: BoxDecoration(
@@ -309,7 +331,8 @@ class _MyHomePageState extends State<HomeConvPage> {
             ),
           ),
           Container(
-              margin: const EdgeInsets.only(left: 5, top: 5, right: 5, bottom: 5),
+              margin:
+                  const EdgeInsets.only(left: 5, top: 5, right: 5, bottom: 5),
               width: 50,
               height: 50,
               decoration: BoxDecoration(
@@ -331,7 +354,7 @@ class _MyHomePageState extends State<HomeConvPage> {
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (BuildContext context) {
-                    return ListContacts();
+                    return ListContacts( socket: socket, setMsg: setMessage);
                   }));
                 },
                 icon: const Icon(
