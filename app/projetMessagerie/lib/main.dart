@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       transitionDuration: const Duration(milliseconds: 500),
-      home:  HomeConvPage(pseudo: ["steph", "loic", "loic", "steph", "loic", "steph"][Random().nextInt(6)],number:"655 30 43 74"), // firstTime? RegisterPage1(): const HomeConvPage(title: 'Message Me'),
+      home: RegisterPage1(), // firstTime? RegisterPage1(): const HomeConvPage(title: 'Message Me'),
     );
   }
 }
