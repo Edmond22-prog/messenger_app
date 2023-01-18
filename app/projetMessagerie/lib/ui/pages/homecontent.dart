@@ -5,26 +5,27 @@ class HomeContent extends StatelessWidget {
   final String nom;
   final String lastmessage;
   final String heurelastmessage;
+  final bool enLigne;
 
-
-  HomeContent({
+  const HomeContent({super.key, 
     required this.photoprofile,
     required this.nom,
     required this.lastmessage,
     required this.heurelastmessage,
+    required this.enLigne,
   });
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      //margin: provenance? EdgeInsets.only(left: 60,top: 22,right: 0,bottom: 10):EdgeInsets.only(left: 0,top: 22,right: 60,bottom: 10),
       width: MediaQuery.of(context).size.width,
       height: 70,
       decoration: BoxDecoration(
-        color: Colors.grey,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(0),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black.withOpacity(0.6),
+            color: Colors.white,
             offset: Offset(
               0.0,
               10.0,
@@ -42,7 +43,7 @@ class HomeContent extends StatelessWidget {
             children: [
               Align(
                 child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.0),
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: Material(
                       elevation: 2.0,
                       shape: CircleBorder(),
@@ -51,49 +52,51 @@ class HomeContent extends StatelessWidget {
                       child: Ink.image(
                         image: AssetImage(photoprofile),
                         fit: BoxFit.cover,
-                        width: 60,
-                        height: 60,
+                        width: 50,
+                        height: 50,
                         child: InkWell(
-                          onTap: (){ },
+                          onTap: () {},
                         ),
                       ),
-                    )
-                ),
+                    )),
                 alignment: Alignment.center,
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Align(
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5.0),
-                        child: Text(nom,
-                          style: TextStyle(
-                              fontSize: 19,
-                              color: Colors.black
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 5,
-                          textAlign: TextAlign.center,
-                        )
+                  Container(
+                    width: 200,
+                    //margin: EdgeInsets.only(right: 70),
+                    child: Align(
+                      child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text(
+                            nom[0].toUpperCase() + nom.substring(1),
+                            style: TextStyle(fontSize: 19, color: Colors.black),
+                            textAlign: TextAlign.start,
+                          )),
+                      alignment: Alignment.topLeft,
                     ),
-                    alignment: Alignment.center,
                   ),
-                  Align(
-                    child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5.0),
-                        child: Text(lastmessage,
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black45
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 5,
-                          textAlign: TextAlign.center,
-                        )
+                  Container(
+                    width: 200,
+                    child: Align(
+                      child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          child: SizedBox(
+                            width: 100,
+                            child: Text(
+                              lastmessage,
+                              style: TextStyle(
+                                  fontSize: 15, color: Colors.black45),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              textAlign: TextAlign.start,
+                            ),
+                          )),
+                      alignment: Alignment.topLeft,
                     ),
-                    alignment: Alignment.center,
-                  ),
+                  )
                 ],
               ),
             ],
@@ -109,17 +112,24 @@ class HomeContent extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(width: 7),
-                        Text(heurelastmessage,style: TextStyle(color: Colors.black),),
+                        Text(
+                          heurelastmessage,
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ],
                     ),
                   ],
                 ),
                 alignment: Alignment.bottomLeft,
               ),
-              Text("")
+              enLigne
+                  ? Text(
+                      "en ligne    ",
+                      style: TextStyle(color: Colors.greenAccent),
+                    )
+                  : Text("en ligne    ", style: TextStyle(color: Colors.white))
             ],
-          )
-
+          ),
         ],
       ),
     );
