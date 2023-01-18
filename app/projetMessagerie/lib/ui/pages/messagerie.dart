@@ -1,37 +1,29 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:projetmessagerie/ui/messagecontent.dart';
+import 'package:projetmessagerie/ui/pages/home.dart';
+import 'package:projetmessagerie/ui/pages/messagecontent.dart';
 import 'package:projetmessagerie/ui/src/widgets/record_button.dart';
 import 'package:record/record.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:intl/intl.dart';
-
-//classe pour gérer les messages que l'utilisateur recevra en cours discussion
-class NewMessageParam {
-  NewMessageParam({Key? key, required this.message, required this.sender});
-  final String message;
-  final String sender;
-  factory NewMessageParam.fromJson(Map<dynamic, dynamic> json) {
-    return NewMessageParam(message: json['message'], sender: json['sender']);
-  }
-}
+import '../../models/new_message_param.dart';
+import '../../models/socket_param.dart';
 
 class MyMessagePage extends StatefulWidget {
   const MyMessagePage(
-      {Key? key,
+      {super.key,
       required this.lechoix,
-      required this.send,
-      required this.setMsg,
-      required this.socket});
+      required this.socket,
+      required this.setMsg});
 
   final InChatModel lechoix;
-  final Function send;
-  final Function setMsg;
   final IO.Socket socket;
+  final Function setMsg;
 
   @override
   State<MyMessagePage> createState() => _MessagePageState();
@@ -52,7 +44,7 @@ class InChatModel {
       required this.isOnLigne});
 
   void add(String date, String message) {
-    listmessage.add(new MessageModel(
+    listmessage.add(MessageModel(
         datetime: date, message: message, EnvMessage: true, etat: false));
   }
 
@@ -88,7 +80,7 @@ class _MessagePageState extends State<MyMessagePage>
   }
 */
 
-   DateTime? startTime;
+  DateTime? startTime;
   Timer? timer;
   String recordDuration = "00:00";
   //late Record record;
@@ -105,8 +97,7 @@ class _MessagePageState extends State<MyMessagePage>
 
   @override
   void initState() {
-     super.initState();
-    //variable socket qui sera utilisée pour faire toutes les transactions nécessitant les sockets
+    super.initState();
     controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -117,10 +108,11 @@ class _MessagePageState extends State<MyMessagePage>
     lechoisie = widget.lechoix;
 
     widget.socket.on("whisper", (content) {
-      print("je reçois ici");
+      debugPrint("je reçois ici");
       var chatReceived = NewMessageParam.fromJson(Map.from(content));
       var date = DateTime.now();
-      print("j'ai reçu le msg de "+ chatReceived.sender + " qui est" +chatReceived.message);
+      debugPrint(
+          "j'ai reçu le msg de ${chatReceived.sender} qui est ${chatReceived.message}");
       String formattedTime = DateFormat.Hm().format(date);
       setState(() {
         lechoisie = widget.lechoix;
@@ -136,28 +128,29 @@ class _MessagePageState extends State<MyMessagePage>
   }
 
   void callEmoji() {
-    print('Emoji Icon Pressed...');
+    debugPrint('Emoji Icon Pressed...');
   }
 
   void callAttachFile() {
-    print('Attach File Icon Pressed...');
+    debugPrint('Attach File Icon Pressed...');
   }
 
   void callCamera() {
-    print('Camera Icon Pressed...');
+    debugPrint('Camera Icon Pressed...');
   }
 
   void callVoice() {
-    print('Voice Icon Pressed...');
+    debugPrint('Voice Icon Pressed...');
   }
 
   void sendMessage() {
     setState(() {
       final setMessage = widget.setMsg;
-      final send = widget.send;
       setMessage(lechoisie.nom, message, "sender");
-      send(message, lechoisie.nom);
-     // lechoisie=widget.lechoix;
+      SocketParam newMessage =
+          SocketParam(message: message, receiver: lechoisie.nom);
+      widget.socket.emit("newMessage", jsonEncode(newMessage));
+      // lechoisie=widget.lechoix;
     });
   }
 
@@ -213,7 +206,6 @@ class _MessagePageState extends State<MyMessagePage>
       children: [
         moodIcon(),
         Expanded(
-            child: Container(
           child: TextField(
             onChanged: (val) {
               setState(() {
@@ -225,14 +217,14 @@ class _MessagePageState extends State<MyMessagePage>
                 message = val;
               });
             },
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
                 hintText: "Message",
                 hintStyle: TextStyle(color: Colors.black),
                 border: InputBorder.none),
             maxLines: 5,
             minLines: 1,
           ),
-        )),
+        ),
         attachFile(),
         camera(),
       ],
@@ -244,6 +236,20 @@ class _MessagePageState extends State<MyMessagePage>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (BuildContext context) {
+              return const HomeConvPage(
+                pseudo: "",
+                number: "",
+              );
+            }));
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+          ),
+        ),
         leadingWidth: 20,
         foregroundColor: Colors.black,
         title: Row(
@@ -251,7 +257,7 @@ class _MessagePageState extends State<MyMessagePage>
           children: [
             Material(
               elevation: 2.0,
-              shape: CircleBorder(),
+              shape: const CircleBorder(),
               clipBehavior: Clip.hardEdge,
               color: Colors.transparent,
               child: Ink.image(
@@ -264,7 +270,7 @@ class _MessagePageState extends State<MyMessagePage>
                 ),
               ),
             ),
-            Text("  "),
+            const Text("  "),
             Column(
               children: [
                 Text(
@@ -274,11 +280,11 @@ class _MessagePageState extends State<MyMessagePage>
                   maxLines: 1,
                 ),
                 lechoisie.isOnLigne
-                    ? Text(
+                    ? const Text(
                         "en ligne",
                         style: TextStyle(color: Colors.black45, fontSize: 12),
                       )
-                    : Text("")
+                    : const Text("")
               ],
             ), //nom de la personne
           ],
@@ -286,19 +292,19 @@ class _MessagePageState extends State<MyMessagePage>
         actions: [
           IconButton(
               onPressed: () {},
-              icon: Icon(
+              icon: const Icon(
                 Icons.call,
                 color: Colors.greenAccent,
               )),
           IconButton(
               onPressed: () {},
-              icon: Icon(
+              icon: const Icon(
                 Icons.videocam,
                 color: Colors.blueAccent,
               )),
           IconButton(
               onPressed: () {},
-              icon: Icon(
+              icon: const Icon(
                 Icons.search,
                 color: Colors.black,
               ))
@@ -322,7 +328,7 @@ class _MessagePageState extends State<MyMessagePage>
           }),
       floatingActionButton: BottomAppBar(
         child: Container(
-            margin: EdgeInsets.only(left: 5, right: 5),
+            margin: const EdgeInsets.only(left: 5, right: 5),
             color: Colors.green.withOpacity(0.1),
             child: Row(children: [
               Expanded(
@@ -360,7 +366,7 @@ class _MessagePageState extends State<MyMessagePage>
     );
   }
 
-  Future<Null> dialog() async {
+  Future<void> dialog() async {
     return showDialog(
         context: context,
         barrierDismissible: true,
@@ -378,7 +384,7 @@ class _MessagePageState extends State<MyMessagePage>
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
+                    children: const [
                       Icon(Icons.file_open, size: 50),
                       Icon(Icons.camera, size: 50),
                       Icon(Icons.filter, size: 50)
@@ -386,7 +392,7 @@ class _MessagePageState extends State<MyMessagePage>
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
+                    children: const [
                       Icon(Icons.music_note_outlined, size: 50),
                       Icon(Icons.location_on_outlined, size: 50),
                       Icon(Icons.contacts, size: 50)
@@ -404,13 +410,13 @@ class _MessagePageState extends State<MyMessagePage>
       final image = await ImagePicker().pickImage(source: imageSource);
       if (image == null) return;
 
-      final imageFinal = File(image.path);
+      // final imageFinal = File(image.path);
       setState(() {
         //function d'envoie de limage
-        print("image envoiyé");
+        debugPrint("image envoiyé");
       });
     } on PlatformException catch (e) {
-      print("Failed to pick image $e");
+      debugPrint("Failed to pick image $e");
     }
   }
 }
